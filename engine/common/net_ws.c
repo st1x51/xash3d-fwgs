@@ -92,13 +92,19 @@ static int ioctl_stub( int d, unsigned long r, ... )
 }
 #define ioctlsocket ioctl_stub
 #else // __EMSCRIPTEN__
+#ifndef __PSP__
 #define ioctlsocket ioctl
+#endif
 #endif // __EMSCRIPTEN__
 #define SOCKET int
 #define INVALID_SOCKET -1
 typedef size_t WSAsize_t;
 #else // WIN32
 typedef int WSAsize_t; // for some reason, MS has signed size. We won't exceed 2^32, probably, so just typedef it
+#endif
+
+#ifdef __PSP__
+#undef HAVE_GETADDRINFO
 #endif
 
 typedef struct
@@ -1392,14 +1398,14 @@ static int NET_Isocket( const char *net_interface, int port, qboolean multicast 
 			Con_DPrintf( S_WARN "NET_UDsocket: port: %d socket: %s\n", port, NET_ErrorString( ));
 		return INVALID_SOCKET;
 	}
-
+#ifndef __PSP__
 	if( NET_IsSocketError( ioctlsocket( net_socket, FIONBIO, &_true ) ) )
 	{
 		Con_DPrintf( S_WARN "NET_UDsocket: port: %d ioctl FIONBIO: %s\n", port, NET_ErrorString( ));
 		close( net_socket );
 		return INVALID_SOCKET;
 	}
-
+#endif
 	// make it broadcast capable
 	if( NET_IsSocketError( setsockopt( net_socket, SOL_SOCKET, SO_BROADCAST, (char *)&_true, sizeof( _true ) ) ) )
 	{
@@ -1521,8 +1527,9 @@ void NET_GetLocalAddress( void )
 		}
 		else
 		{
+#ifndef __PSP__
 			gethostname( buff, 512 );
-
+#endif
 			// ensure that it doesn't overrun the buffer
 			buff[511] = 0;
 		}
@@ -2124,7 +2131,9 @@ void HTTP_Run( void )
 			// You may skip this if not supported by system,
 			// but download will lock engine, maybe you will need to add manual returns
 			mode = 1;
+#ifndef __PSP__
 			ioctlsocket( curfile->socket, FIONBIO, &mode );
+#endif
 	#ifdef __linux__
 			// SOCK_NONBLOCK is not portable, so use fcntl
 			fcntl( curfile->socket, F_SETFL, fcntl( curfile->socket, F_GETFL, 0 ) | O_NONBLOCK );

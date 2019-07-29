@@ -1,0 +1,11 @@
+{
+	"files.associations": {
+		"common.h": "c",
+		"client.h": "c",
+		"mathlib.h": "c",
+		"pspkernel.h": "c",
+		"psputility.h": "c",
+		"pspctrl.h": "c",
+		"in.h": "c"
+	}
+}

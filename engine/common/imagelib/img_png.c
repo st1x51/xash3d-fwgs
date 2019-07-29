@@ -23,6 +23,15 @@ GNU General Public License for more details.
 #include "imagelib.h"
 #include "mathlib.h"
 
+#ifdef __PSP__
+static inline unsigned int scentohl(unsigned int x)
+{
+    return (((x & 0xFF)<<24) | ((x & 0xFF00)<<8) | ((x>>8) & 0xFF00) | ((x>>24) & 0xFF));
+}
+#define ntohl(x) scentohl(x)
+#define htonl(x) scentohl(x)
+#endif
+
 static const char png_sign[] = {0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'};
 static const char ihdr_sign[] = {'I', 'H', 'D', 'R'};
 static const char idat_sign[] = {'I', 'D', 'A', 'T'};

@@ -43,6 +43,7 @@ GNU General Public License for more details.
 #undef XASH_MIPS
 #undef XASH_JS
 #undef XASH_E2K
+#undef XASH_PSP
 
 //================================================================
 //
@@ -82,6 +83,8 @@ GNU General Public License for more details.
 	#endif
 #elif defined __EMSCRIPTEN__
 	#define XASH_EMSCRIPTEN 1
+#elif defined __PSP__
+	#define XASH_PSP 1
 #else
 #error "Place your operating system name here! If this is a mistake, try to fix conditions above and report a bug"
 #endif

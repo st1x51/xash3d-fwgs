@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:\\cygwin64\\usr\\local\\pspdev\\psp\\include",
+                "C:\\cygwin64\\usr\\local\\pspdev\\psp\\sdk\\include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "__PSP__",
+                "SINGLE_BINARY"
+            ],
+            "compilerPath": "C:\\cygwin64\\usr\\local\\pspdev\\bin\\psp-gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}

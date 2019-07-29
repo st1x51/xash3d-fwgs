@@ -67,6 +67,26 @@ SETUP BACKENDS DEFINITIONS
 		#endif
 	#endif // android case
 
+	#if defined __PSP__
+
+		#ifndef XASH_VIDEO
+			#define XASH_VIDEO VIDEO_PSP
+		#endif
+
+		#ifndef XASH_TIMER
+			#define XASH_TIMER TIMER_PSP
+		#endif
+
+		#ifndef XASH_INPUT
+			#define XASH_INPUT INPUT_NULL
+		#endif
+
+		#ifndef XASH_SOUND
+			#define XASH_SOUND SOUND_NULL
+		#endif
+
+	#endif
+
 #endif // XASH_DEDICATED
 
 // select crashhandler based on defines

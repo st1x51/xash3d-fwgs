@@ -81,6 +81,8 @@ const char *Q_buildos( void )
 	osname = "openbsd";
 #elif XASH_EMSCRIPTEN
 	osname = "emscripten";
+#elif XASH_PSP
+	osname = "psp";
 #else
 #error "Place your operating system name here! If this is a mistake, try to fix conditions above and report a bug"
 #endif
