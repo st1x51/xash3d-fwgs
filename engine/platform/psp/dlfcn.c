@@ -20,118 +20,81 @@ static dll_t *dll_list;
 static char *dll_err = NULL;
 static char dll_err_buf[1024];
 
-static void *dlfind(const char *name)
+static void *dlfind( const char *name )
 {
 	dll_t *d = NULL;
-	for(d = dll_list; d; d = d->next)
-		if(!Q_strcmp(d->name, name))
+	for( d = dll_list; d; d = d->next )
+		if( !Q_strcmp( d->name, name ) )
 			break;
 	return d;
 }
 
-static const char *dlname(void *handle)
+static const char *dlname( void *handle )
 {
 	dll_t *d = NULL;
-	for(d = dll_list; d; d = d->next)
-		if(d == handle)
-			break;
+	// iterate through all dll_ts to check if the handle is actually in the list
+	// and not some bogus pointer from god knows where
+	for( d = dll_list; d; d = d->next ) if( d == handle ) break;
 	return d ? d->name : NULL;
 }
 
-void *dlopen(const char *name, int flag)
+void *dlopen( const char *name, int flag )
 {
-	if(!name)
-		return NULL;
+	if( !name ) return NULL;
 
-	dll_t *old = dlfind(name);
-	if(old)
-	{
-		old->refcnt++;
-		return old;
-	}
+	dll_t *old = dlfind( name );
+	if( old ) { old->refcnt++; return old; }
 
 	char fullpath[MAX_SYSPATH];
-	Q_snprintf(fullpath, sizeof(fullpath), "%s", name);
+	Q_snprintf( fullpath, sizeof(fullpath), "%s", name );
 
 	int status = 0;
-	SceUID h = pspSdkLoadStartModule(fullpath, PSP_MEMORY_PARTITION_USER);
+	SceUID h = pspSdkLoadStartModule( fullpath, PSP_MEMORY_PARTITION_USER );
 
-	if(!h)
+	if( !h ) { dll_err = "dlopen(): something went wrong"; return NULL; }
+	if( h < 0 )
 	{
-		dll_err = "dlopen(): something went wrong";
-		return NULL;
-	}
-
-	if(h < 0)
-	{
-		snprintf(dll_err_buf, sizeof(dll_err_buf), "dlopen(%s): error 0x%X\n", name, h);
+		snprintf( dll_err_buf, sizeof( dll_err_buf ), "dlopen(%s): error 0x%X\n", name, h );
 		dll_err = dll_err_buf;
 		return NULL;
 	}
 	else
-		Con_Printf("dlopen(%s): success!\n", fullpath);
+		Con_Printf ( "dlopen(%s): success!\n", fullpath );
 
-	dll_t *new = calloc(1, sizeof(dll_t));
-	if(!new)
-	{
-		dll_err = "dlopen(): out of memory";
-		return NULL;
-	}
-	
-	snprintf(new->name, MAX_DLNAMELEN, name);
+	dll_t *new = calloc( 1, sizeof( dll_t ) );
+	if( !new ) { dll_err = "dlopen(): out of memory";  return NULL; }
+	snprintf( new->name, MAX_DLNAMELEN, name );
 	new->handle = h;
 
 	int i = 0;
-	//if(!strcmp("libxashmenu.prx", name))
-	//	new->exp = psp_menu_exports;
-	//if(!strcmp("VALVE/cl_dlls/client.prx", name))
-	//{
-	//	printf("STATUS: %s\n", load_client_exports(&(new->exp)));
-	//}
-	//if(!strcmp("VALVE/dlls/hl.so", name))
-	//{
-	//	printf("STATUS: %s\n", load_server_exports(&(new->exp)));
-	//}
 	if(strstr(name, "ref_gl"))
 	{
-		printf("STATUS: %s\n", load_refgu_exports(&(new->exp)));
+		printf("DLOPEN STATUS: %s\n", load_refgu_exports(&(new->exp)));
 	}
 	
 	new->refcnt = 1;
+
 	new->next = dll_list;
 	dll_list = new;
+
 	return new;
 }
 
-void *dlsym(void *handle, const char *symbol)
+void *dlsym( void *handle, const char *symbol )
 {
-	if(!handle || !symbol)
-	{
-		dll_err = "dlsym(): NULL args";
-		return NULL;
-	}
-
-	if(!dlname(handle))
-	{
-		dll_err = "dlsym(): unknown handle";
-		return NULL;
-	
-	}
+	if( !handle || !symbol ) { dll_err = "dlsym(): NULL args"; return NULL; }
+	if( !dlname( handle ) ) { dll_err = "dlsym(): unknown handle"; return NULL; }
 	dll_t *d = handle;
-	if(!d->refcnt)
-	{
-		dll_err = "dlsym(): call dlopen() first";
-		return NULL;
-	}
-
+	if( !d->refcnt ) { dll_err = "dlsym(): call dlopen() first"; return NULL; }
 	dllexport_t *f = NULL;
-
-	for(f = d->exp; f && f->func; f++)
-		if(!Q_strcmp(f->name, symbol))
+	for( f = d->exp; f && f->func; f++ )
+		if( !Q_strcmp( f->name, symbol ) )
 			break;
 
-	if(f && f->func)
+	if( f && f->func )
+	{
 		return f->func;
+	}
 	else
 	{
 		dll_err = "dlsym(): symbol not found in dll";
@@ -139,53 +102,44 @@ void *dlsym(void *handle, const char *symbol)
 	}
 }
 
-int dlclose(void *handle)
+int dlclose( void *handle )
 {
-	if(!handle)
-	{
-		dll_err = "dlclose(): NULL arg";
-		return -1;
-	}
-
-	if(!dlname(handle))
-	{
-		dll_err = "dlclose(): unknown handle";
-		return -2;
-	}
+	if( !handle ) { dll_err = "dlclose(): NULL arg"; return -1; }
+	if( !dlname( handle ) ) { dll_err = "dlclose(): unknown handle"; return -2; }
 
 	dll_t *d = handle;
 	d->refcnt--;
-
-	if(d->refcnt <= 0)
+	if( d->refcnt <= 0 )
 	{
 		int status = 0;
 		int ret = 0;
-		//int ret = sceKernelStopModule(d->handle, 0, NULL, 0, NULL, &status);
-
-		if(ret != SCE_KERNEL_ERROR_OK)
+		//int ret = sceKernelStopModule( d->handle, 0, NULL, 0, NULL, &status );
+		if( ret != SCE_KERNEL_ERROR_OK )
 		{
-			snprintf(dll_err_buf, sizeof(dll_err_buf), "dlclose(): error %d", ret);
+			snprintf( dll_err_buf, sizeof( dll_err_buf ), "dlclose(): error %d", ret );
 			dll_err = dll_err_buf;
 		}
-		else if(status == SCE_KERNEL_ERROR_NOT_STOPPED)
+		else if( status == SCE_KERNEL_ERROR_NOT_STOPPED )
 		{
 			dll_err = "dlclose(): module doesn't want to stop";
 			return -3;
 		}
 
-		if(d == dll_list)
+		if( d == dll_list )
 			dll_list = NULL;
 		else
 		{
 			dll_t *pd;
-			for(pd = dll_list; pd; pd = pd->next)
-				if(pd->next == d)
+			for( pd = dll_list; pd; pd = pd->next )
+			{
+				if( pd->next == d )
 				{
 					pd->next = d->next;
 					break;
 				}
+			}
 		}
-		free(d);
+		free( d );
 	}
 	return 0;
 }
@@ -197,26 +151,23 @@ char *dlerror(void)
 	return err;
 }
 
-int dladdr(const void *addr, Dl_info *info)
+int dladdr( const void *addr, Dl_info *info )
 {
 	dll_t *d = NULL;
 	dllexport_t *f = NULL;
-	
-	for(d = dll_list; d; d = d->next)
-		for(f = d->exp; f && f->func; f++)
-			if(f->func == addr)
-			{
-				if(d && f && f->func)
-				{
-					if(info)
-					{
-						info->dli_fhandle = d;
-						info->dli_sname = f->name;
-						info->dli_saddr = addr;
-					}
-					return 1;
-				}
-				return 0;
-			}
+	for( d = dll_list; d; d = d->next )
+		for( f = d->exp; f && f->func; f++ )
+			if( f->func == addr ) goto for_end;
+for_end:
+	if( d && f && f->func )
+	{
+		if( info )
+		{
+			info->dli_fhandle = d;
+			info->dli_sname = f->name;
+			info->dli_saddr = addr;
+		}
+		return 1;
+	}
 	return 0;
 }

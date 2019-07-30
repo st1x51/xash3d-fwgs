@@ -5,54 +5,23 @@
 #include <pspgu.h>
 #include <pspgum.h>
 #include <pspdisplay.h>
+#include <GLES/egl.h>
+#include <GLES/gl.h>
 
-static unsigned int staticOffset = 0;
+EGLDisplay dpy;
+EGLConfig config;
+EGLint num_configs;
+EGLContext ctx;
+EGLSurface surface;
 
-static unsigned int getMemorySize(unsigned int width, unsigned int height, unsigned int psm)
-{
-	switch (psm)
-	{
-		case GU_PSM_T4:
-			return (width * height) >> 1;
-
-		case GU_PSM_T8:
-			return width * height;
-
-		case GU_PSM_5650:
-		case GU_PSM_5551:
-		case GU_PSM_4444:
-		case GU_PSM_T16:
-			return 2 * width * height;
-
-		case GU_PSM_8888:
-		case GU_PSM_T32:
-			return 4 * width * height;
-
-		default:
-			return 0;
-	}
-}
-
-void* getStaticVramBuffer(unsigned int width, unsigned int height, unsigned int psm)
-{
-	unsigned int memSize = getMemorySize(width,height,psm);
-	void* result = (void*)staticOffset;
-	staticOffset += memSize;
-
-	return result;
-}
-
-void* getStaticVramTexture(unsigned int width, unsigned int height, unsigned int psm)
-{
-	void* result = getStaticVramBuffer(width,height,psm);
-	return (void*)(((unsigned int)result) + ((unsigned int)sceGeEdramGetAddr()));
-}
-
-static unsigned int __attribute__((aligned(16))) display_list[262144];
-
-#define SCR_WIDTH 480
-#define SCR_HEIGHT 272
-#define SCR_BPP 16
+static const EGLint attrib_list [] = {
+	EGL_RED_SIZE, 4,
+	EGL_GREEN_SIZE, 4,
+	EGL_BLUE_SIZE, 4,
+	EGL_ALPHA_SIZE, 4,
+	EGL_DEPTH_SIZE, 0,
+	EGL_NONE
+};
 
 void GL_UpdateSwapInterval( void )
 {
@@ -80,7 +49,7 @@ vidmode_t* R_GetVideoMode( int num )
 
 qboolean VID_SetMode( void )
 {
-	R_ChangeDisplaySettings( SCR_HEIGHT, SCR_WIDTH, true );
+	R_ChangeDisplaySettings( 480, 272, true );
 	return true;
 }
 
@@ -88,7 +57,7 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 {
 	Con_Reportf( "R_ChangeDisplaySettings: Setting video mode to %dx%d %s\n", width, height, fullscreen ? "fullscreen" : "windowed" );
 
-	glw_state.desktopBitsPixel = SCR_BPP;
+	glw_state.desktopBitsPixel = 16;
 	glw_state.desktopWidth = width;
 	glw_state.desktopHeight = height;
 	refState.fullScreen = fullscreen;
@@ -107,25 +76,14 @@ qboolean R_Init_Video( const int type )
 {
 	VID_StartupGamma();
 
-	sceGuInit();
+	dpy = eglGetDisplay(0);
+	eglInitialize(dpy, NULL, NULL);
 
-	void* fbp0 = getStaticVramBuffer(512, SCR_HEIGHT, GU_PSM_8888);
-	void* fbp1 = getStaticVramBuffer(512, SCR_HEIGHT, GU_PSM_8888);
-	void* zbp = getStaticVramBuffer(512, SCR_HEIGHT, GU_PSM_4444);
+	eglChooseConfig(dpy, attrib_list, &config, 1, &num_configs);
 
-	sceGuStart(GU_DIRECT, display_list);
-	sceGuDrawBuffer(GU_PSM_8888, fbp0, 512);
-	sceGuDispBuffer(SCR_WIDTH, SCR_HEIGHT, fbp1, 512);
-	sceGuDepthBuffer(zbp, 512);
-
-	sceGuOffset(2048 - (SCR_WIDTH/2), 2048 - (SCR_HEIGHT/2));
-	sceGuFinish();
-	sceGuSync(0,0);
-
-	sceDisplayWaitVblankStart();
-	sceGuDisplay(GU_TRUE);
-
-	sceGuStart(GU_DIRECT, display_list);
+	ctx = eglCreateContext(dpy, config, NULL, NULL);
+	surface = eglCreateWindowSurface(dpy, config, 0, NULL);
+	eglMakeCurrent(dpy, surface, surface, ctx);
 
 	host.renderinfo_changed = false;
 	return true;
@@ -148,11 +106,7 @@ int GL_GetAttribute( int attr, int *val )
 
 void GL_SwapBuffers()
 {
-	sceGuFinish();
-	sceGuSync(0,0);
-	sceDisplayWaitVblankStart();
-	sceGuSwapBuffers();
-	sceGuStart(GU_DIRECT, display_list);
+	eglSwapBuffers(dpy, surface);
 }
 
 void *SW_LockBuffer()

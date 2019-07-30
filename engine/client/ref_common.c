@@ -438,9 +438,7 @@ static qboolean R_LoadProgs( const char *name )
 	}
 #endif
 
-	FS_AllowDirectPaths( false ); 
-
-	if( (REFAPI)COM_GetProcAddress( ref.hInstance, "GetRefAPI" ) == NULL )
+	if( ( GetRefAPI = (REFAPI)COM_GetProcAddress( ref.hInstance, "GetRefAPI" ) ) == NULL )
 	{
 		COM_FreeLibrary( ref.hInstance );
 		Con_Reportf( "R_LoadProgs: can't init renderer API\n" );
@@ -451,7 +449,7 @@ static qboolean R_LoadProgs( const char *name )
 	// make local copy of engfuncs to prevent overwrite it with user dll
 	memcpy( &gpEngfuncs, &gEngfuncs, sizeof( gpEngfuncs ));
 
-	if( !GetRefAPI( REF_API_VERSION, &ref.dllFuncs, &gpEngfuncs, &refState ))
+	if( !GetRefAPI( REF_API_VERSION, &ref.dllFuncs, &gpEngfuncs, &refState ) )
 	{
 		COM_FreeLibrary( ref.hInstance );
 		Con_Reportf( "R_LoadProgs: can't init renderer API: wrong version\n" );
@@ -460,7 +458,6 @@ static qboolean R_LoadProgs( const char *name )
 	}
 
 	refState.developer = host_developer.value;
-
 	if( !ref.dllFuncs.R_Init( ) )
 	{
 		COM_FreeLibrary( ref.hInstance );

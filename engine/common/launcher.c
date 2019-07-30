@@ -94,14 +94,15 @@ int main( int argc, char** argv )
 	}catch(e){};);
 #endif
 #endif
-#ifdef __PSP__
-	int myargc = 1;
-  	argv[myargc++] = "-dev";
-	argv[myargc++] = "5";
-#endif
 
 	g_iArgc = argc;
 	g_pszArgv = argv;
+
+	#ifdef __PSP__
+  	g_pszArgv[g_iArgc++] = "-dev";
+	g_pszArgv[g_iArgc++] = "5";
+	#endif
+
 #if TARGET_OS_IPHONE
 	{
 		void IOS_LaunchDialog( void );

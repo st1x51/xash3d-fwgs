@@ -2577,7 +2577,7 @@ static void R_StudioDrawBones( void )
 	{
 		if( pbones[i].parent >= 0 )
 		{
-			//pglPointSize( 3.0f );
+			pglPointSize( 3.0f );
 			pglColor3f( 1, 0.7f, 0 );
 			pglBegin( GL_LINES );
 			
@@ -2602,7 +2602,7 @@ static void R_StudioDrawBones( void )
 		else
 		{
 			// draw parent bone node
-			//pglPointSize( 5.0f );
+			pglPointSize( 5.0f );
 			pglColor3f( 0.8f, 0, 0 );
 			pglBegin( GL_POINTS );
 			Matrix3x4_OriginFromMatrix( g_studio.bonestransform[i], point );
@@ -2611,7 +2611,7 @@ static void R_StudioDrawBones( void )
 		}
 	}
 
-	//pglPointSize( 1.0f );
+	pglPointSize( 1.0f );
 	pglEnable( GL_TEXTURE_2D );
 }
 
@@ -2648,12 +2648,12 @@ static void R_StudioDrawAttachments( void )
 		pglVertex3fv( v[3] );
 		pglEnd();
 
-		//pglPointSize( 5.0f );
+		pglPointSize( 5.0f );
 		pglColor3f( 0, 1, 0 );
 		pglBegin( GL_POINTS );
 		pglVertex3fv( v[0] );
 		pglEnd();
-		//pglPointSize( 1.0f );
+		pglPointSize( 1.0f );
 	}
 
 	pglEnable( GL_TEXTURE_2D );
@@ -3158,12 +3158,12 @@ void R_StudioRenderFinal( void )
 		pglVertex3fv( origin );
 		pglEnd();
 
-		//pglPointSize( 5.0f );
+		pglPointSize( 5.0f );
 		pglColor3f( 1, 0, 0 );
 		pglBegin( GL_POINTS );
 		pglVertex3fv( g_studio.lightspot );
 		pglEnd();
-		//pglPointSize( 1.0f );
+		pglPointSize( 1.0f );
 
 		pglEnable( GL_DEPTH_TEST );
 		pglEnable( GL_TEXTURE_2D );

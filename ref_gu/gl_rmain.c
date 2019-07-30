@@ -800,7 +800,7 @@ void R_DrawFog( void )
 	else pglFogi( GL_FOG_MODE, GL_EXP );
 	pglFogf( GL_FOG_DENSITY, RI.fogDensity );
 	pglFogfv( GL_FOG_COLOR, RI.fogColor );
-	//pglHint( GL_FOG_HINT, GL_NICEST );
+	pglHint( GL_FOG_HINT, GL_NICEST );
 }
 
 /*

@@ -3,7 +3,7 @@
 #include "cvar.h"
 #include "ref_api.h"
 
-PSP_MODULE_INFO("ref_gl", 0, 1, 0);
+PSP_MODULE_INFO("ref_gl", PSP_MODULE_USER, 1, 0);
 PSP_NO_CREATE_MAIN_THREAD();
 
 typedef struct dllexport_s
@@ -13,20 +13,20 @@ typedef struct dllexport_s
 } dllexport_t;
 
 //static void CL_FillRGBABlend( float _x, float _y, float _w, float _h, int r, int g, int b, int a );
-int GetRefAPI( int version, ref_interface_t *funcs, ref_api_t *engfuncs, ref_globals_t *globals );
-void VGUI_DrawInit( void );
-void VGUI_DrawShutdown( void );
-int VGUI_GenerateTexture( void );
-void VGUI_UploadTexture( int id, const char *buffer, int width, int height );
-void VGUI_CreateTexture( int id, int width, int height );
-void VGUI_UploadTextureBlock( int id, int drawX, int drawY, const byte *rgba, int blockWidth, int blockHeight );
-void VGUI_SetupDrawingRect( int *pColor );
-void VGUI_SetupDrawingText( int *pColor );
-void VGUI_SetupDrawingImage( int *pColor );
-void VGUI_BindTexture( int id );
-void VGUI_GetTextureSizes( int *width, int *height );
-void VGUI_EnableTexture( qboolean enable );
-void VGUI_DrawQuad( const vpoint_t *ul, const vpoint_t *lr );
+int GAME_EXPORT GetRefAPI( int version, ref_interface_t *funcs, ref_api_t *engfuncs, ref_globals_t *globals );
+void GAME_EXPORT VGUI_DrawInit( void );
+void GAME_EXPORT VGUI_DrawShutdown( void );
+int GAME_EXPORT VGUI_GenerateTexture( void );
+void GAME_EXPORT VGUI_UploadTexture( int id, const char *buffer, int width, int height );
+void GAME_EXPORT VGUI_CreateTexture( int id, int width, int height );
+void GAME_EXPORT VGUI_UploadTextureBlock( int id, int drawX, int drawY, const byte *rgba, int blockWidth, int blockHeight );
+void GAME_EXPORT VGUI_SetupDrawingRect( int *pColor );
+void GAME_EXPORT VGUI_SetupDrawingText( int *pColor );
+void GAME_EXPORT VGUI_SetupDrawingImage( int *pColor );
+void GAME_EXPORT VGUI_BindTexture( int id );
+void GAME_EXPORT VGUI_GetTextureSizes( int *width, int *height );
+void GAME_EXPORT VGUI_EnableTexture( qboolean enable );
+void GAME_EXPORT VGUI_DrawQuad( const vpoint_t *ul, const vpoint_t *lr );
 
 dllexport_t exports[] =
 {
@@ -47,8 +47,6 @@ dllexport_t exports[] =
 	{ "VGUI_DrawQuad", (void*)VGUI_DrawQuad },
 	{ NULL, NULL },
 };
-
-extern void __global_ctors();
 
 int module_start( SceSize arglen, void *argp )
 {

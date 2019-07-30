@@ -1314,12 +1314,12 @@ static void R_AliasDrawLightTrace( cl_entity_t *e )
 		pglVertex3fv( origin );
 		pglEnd();
 
-		//pglPointSize( 5.0f );
+		pglPointSize( 5.0f );
 		pglColor3f( 1, 0, 0 );
 		pglBegin( GL_POINTS );
 		pglVertex3fv( g_alias.lightspot );
 		pglEnd();
-		//pglPointSize( 1.0f );
+		pglPointSize( 1.0f );
 
 		pglEnable( GL_DEPTH_TEST );
 		pglEnable( GL_TEXTURE_2D );

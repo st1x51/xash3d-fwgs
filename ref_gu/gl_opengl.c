@@ -458,7 +458,7 @@ static void GL_SetDefaults( void )
 	pglShadeModel( GL_SMOOTH );
 	pglFrontFace( GL_CCW );
 
-	//pglPointSize( 1.2f );
+	pglPointSize( 1.2f );
 	pglLineWidth( 1.2f );
 
 	GL_Cull( GL_NONE );
