@@ -1,11 +1,12 @@
 #include "common.h"
 #include <pspkernel.h>
 #include <pspsdk.h>
+#include "dlfcn.h"
 
 #define MAX_DLNAMELEN 256
 
-const char *load_client_exports(dllexport_t* exp[]);
-const char *load_server_exports(dllexport_t* exp[]);
+//const char *load_client_exports(dllexport_t* exp[]);
+//const char *load_server_exports(dllexport_t* exp[]);
 
 typedef struct dll_s
 {
@@ -84,14 +85,14 @@ void *dlopen(const char *name, int flag)
 	int i = 0;
 	//if(!strcmp("libxashmenu.prx", name))
 	//	new->exp = psp_menu_exports;
-	if(!strcmp("VALVE/cl_dlls/client.prx", name))
-	{
-		printf("STATUS: %s\n", load_client_exports(&(new->exp)));
-	}
-	if(!strcmp("VALVE/dlls/hl.so", name))
-	{
-		printf("STATUS: %s\n", load_server_exports(&(new->exp)));
-	}
+	//if(!strcmp("VALVE/cl_dlls/client.prx", name))
+	//{
+	//	printf("STATUS: %s\n", load_client_exports(&(new->exp)));
+	//}
+	//if(!strcmp("VALVE/dlls/hl.so", name))
+	//{
+	//	printf("STATUS: %s\n", load_server_exports(&(new->exp)));
+	//}
 	
 	new->refcnt = 1;
 	new->next = dll_list;

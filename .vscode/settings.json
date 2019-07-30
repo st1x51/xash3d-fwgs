@@ -6,6 +6,11 @@
 		"pspkernel.h": "c",
 		"psputility.h": "c",
 		"pspctrl.h": "c",
-		"in.h": "c"
+		"in.h": "c",
+		"platform.h": "c",
+		"psp_library.h": "c",
+		"dlfcn.h": "c",
+		"stddef.h": "c",
+		"port.h": "c"
 	}
 }

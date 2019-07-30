@@ -128,7 +128,7 @@ char *Sys_GetCurrentUser( void )
 
 	if( GetUserName( s_userName, &size ))
 		return s_userName;
-#elif !defined(__ANDROID__)
+#elif !defined(__ANDROID__) && !defined(__PSP__)
 	uid_t uid = geteuid();
 	struct passwd *pw = getpwuid( uid );
 

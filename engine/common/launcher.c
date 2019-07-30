@@ -15,11 +15,11 @@ GNU General Public License for more details.
 
 #ifdef __PSP__
 #include <pspkernel.h>
+#include "platform/psp/dlfcn.h"
+#include <pspctrl.h>
 PSP_MODULE_INFO("engine", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU);
 PSP_HEAP_SIZE_KB(-2 * 1024);
-#include "platform/psp/dlfcn.h"
-#include <pspctrl.h>
 #endif
 
 #ifdef SINGLE_BINARY

@@ -4,8 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:\\cygwin64\\usr\\local\\pspdev\\psp\\include",
-                "C:\\cygwin64\\usr\\local\\pspdev\\psp\\sdk\\include"
+                "C:\\cygwin64\\usr\\local\\pspdev\\psp\\include\\**",
+                "C:\\cygwin64\\usr\\local\\pspdev\\psp\\sdk\\include\\**"
             ],
             "defines": [
                 "_DEBUG",

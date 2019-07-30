@@ -8,7 +8,6 @@ SOURCE_DIRS := \
 	engine/common/imagelib \
 	engine/common/soundlib \
 	engine/common/soundlib/libmpg \
-	engine/platform/posix \
 	engine/platform/psp \
 	engine/server \
 	public
@@ -30,11 +29,10 @@ INCLUDES := \
 	engine/server
 
 CFILES := $(foreach dir,$(SOURCE_DIRS),$(addprefix $(dir)/,$(notdir $(wildcard $(dir)/*.c))))
-
 OBJS = $(CFILES:.c=.o)
 INCDIR = $(INCLUDES)
 CFLAGS = -DSINGLE_BINARY -DXASH_NO_ASYNC_NS_RESOLVE -DPATH_MAX=256 -D__PSP__ -finline-limit=10 \
-	-g -Werror=implicit-function-declaration -Werror=return-type -Werror=parentheses -fvisibility=hidden -O0
+	-g -G0 -Werror=implicit-function-declaration -Werror=return-type -Werror=parentheses -fvisibility=hidden -O0
 LIBS = -lc -lstdc++ -lm -lpspaudio -lpspvram -lpspgum -lpspgu -lpsphprm -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpspvfpu \
 	-lpspnet_inet -lpspnet_apctl -lpspnet_resolver -lpsprtc -lpsplibc -lpsputility -lpspuser -lpspkernel
 

@@ -49,6 +49,10 @@ GNU General Public License for more details.
 	#else
 	#endif
 
+	#if defined(__PSP__)
+	#include "platform/psp/psp_stub.h"
+	#endif
+
 	#define VGUI_SUPPORT_DLL "libvgui_support." OS_LIB_EXT
 
 	// Windows-specific

@@ -23,4 +23,5 @@ void Platform_Sleep( int msec )
 {
 	sceKernelDelayThread( msec * 1000 );
 }
+
 #endif

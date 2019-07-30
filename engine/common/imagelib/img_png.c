@@ -13,6 +13,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
+#ifdef __PSP__
+#include "platform/psp/psp_stub.h"
+#endif
+
 #ifdef _WIN32
 #include <winsock.h>
 #else
@@ -22,15 +26,6 @@ GNU General Public License for more details.
 #include "miniz.h"
 #include "imagelib.h"
 #include "mathlib.h"
-
-#ifdef __PSP__
-static inline unsigned int scentohl(unsigned int x)
-{
-    return (((x & 0xFF)<<24) | ((x & 0xFF00)<<8) | ((x>>8) & 0xFF00) | ((x>>24) & 0xFF));
-}
-#define ntohl(x) scentohl(x)
-#define htonl(x) scentohl(x)
-#endif
 
 static const char png_sign[] = {0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'};
 static const char ihdr_sign[] = {'I', 'H', 'D', 'R'};
