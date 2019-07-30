@@ -1017,8 +1017,8 @@ static void GL_TextureImageRAW( gl_texture_t *tex, GLint side, GLint level, GLin
 
 	if( tex->target == GL_TEXTURE_1D )
 	{
-		if( subImage ) pglTexSubImage1D( tex->target, level, 0, width, inFormat, dataType, data );
-		else pglTexImage1D( tex->target, level, tex->format, width, 0, inFormat, dataType, data );
+		//if( subImage ) pglTexSubImage1D( tex->target, level, 0, width, inFormat, dataType, data );
+		//else pglTexImage1D( tex->target, level, tex->format, width, 0, inFormat, dataType, data );
 	}
 	else if( tex->target == GL_TEXTURE_CUBE_MAP_ARB )
 	{
@@ -1027,8 +1027,8 @@ static void GL_TextureImageRAW( gl_texture_t *tex, GLint side, GLint level, GLin
 	}
 	else if( tex->target == GL_TEXTURE_3D || tex->target == GL_TEXTURE_2D_ARRAY_EXT )
 	{
-		if( subImage ) pglTexSubImage3D( tex->target, level, 0, 0, 0, width, height, depth, inFormat, dataType, data );
-		else pglTexImage3D( tex->target, level, tex->format, width, height, depth, 0, inFormat, dataType, data );
+		//if( subImage ) pglTexSubImage3D( tex->target, level, 0, 0, 0, width, height, depth, inFormat, dataType, data );
+		//else pglTexImage3D( tex->target, level, tex->format, width, height, depth, 0, inFormat, dataType, data );
 	}
 	else // 2D or RECT
 	{
@@ -1047,23 +1047,23 @@ static void GL_TextureImageDXT( gl_texture_t *tex, GLint side, GLint level, GLin
 #ifndef XASH_GLES
 	if( tex->target == GL_TEXTURE_1D )
 	{
-		if( subImage ) pglCompressedTexSubImage1DARB( tex->target, level, 0, width, tex->format, size, data );
-		else pglCompressedTexImage1DARB( tex->target, level, tex->format, width, 0, size, data );
+		//if( subImage ) pglCompressedTexSubImage1DARB( tex->target, level, 0, width, tex->format, size, data );
+		//else pglCompressedTexImage1DARB( tex->target, level, tex->format, width, 0, size, data );
 	}
 	else if( tex->target == GL_TEXTURE_CUBE_MAP_ARB )
 	{
-		if( subImage ) pglCompressedTexSubImage2DARB( cubeTarget + side, level, 0, 0, width, height, tex->format, size, data );
-		else pglCompressedTexImage2DARB( cubeTarget + side, level, tex->format, width, height, 0, size, data );
+		//if( subImage ) pglCompressedTexSubImage2DARB( cubeTarget + side, level, 0, 0, width, height, tex->format, size, data );
+		//else pglCompressedTexImage2DARB( cubeTarget + side, level, tex->format, width, height, 0, size, data );
 	}
 	else if( tex->target == GL_TEXTURE_3D || tex->target == GL_TEXTURE_2D_ARRAY_EXT )
 	{
-		if( subImage ) pglCompressedTexSubImage3DARB( tex->target, level, 0, 0, 0, width, height, depth, tex->format, size, data );
-		else pglCompressedTexImage3DARB( tex->target, level, tex->format, width, height, depth, 0, size, data );
+		//if( subImage ) pglCompressedTexSubImage3DARB( tex->target, level, 0, 0, 0, width, height, depth, tex->format, size, data );
+		//else pglCompressedTexImage3DARB( tex->target, level, tex->format, width, height, depth, 0, size, data );
 	}
 	else // 2D or RECT
 	{
-		if( subImage ) pglCompressedTexSubImage2DARB( tex->target, level, 0, 0, width, height, tex->format, size, data );
-		else pglCompressedTexImage2DARB( tex->target, level, tex->format, width, height, 0, size, data );
+		//if( subImage ) pglCompressedTexSubImage2DARB( tex->target, level, 0, 0, width, height, tex->format, size, data );
+		//else pglCompressedTexImage2DARB( tex->target, level, tex->format, width, height, 0, size, data );
 	}
 #endif
 }

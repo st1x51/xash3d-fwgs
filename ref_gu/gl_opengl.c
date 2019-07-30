@@ -458,7 +458,7 @@ static void GL_SetDefaults( void )
 	pglShadeModel( GL_SMOOTH );
 	pglFrontFace( GL_CCW );
 
-	pglPointSize( 1.2f );
+	//pglPointSize( 1.2f );
 	pglLineWidth( 1.2f );
 
 	GL_Cull( GL_NONE );
@@ -732,14 +732,14 @@ void GL_InitExtensions( void )
 		if( gpGlobals->developer )
 		{
 			gEngfuncs.Con_Reportf( "Installing GL_DebugOutput...\n");
-			pglDebugMessageCallbackARB( GL_DebugOutput, NULL );
+			//pglDebugMessageCallbackARB( GL_DebugOutput, NULL );
 
 			// force everything to happen in the main thread instead of in a separate driver thread
 			pglEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB );
 		}
 
 		// enable all the low priority messages
-		pglDebugMessageControlARB( GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_ARB, 0, NULL, true );
+		//pglDebugMessageControlARB( GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_ARB, 0, NULL, true );
 	}
 
 	if( GL_Support( GL_TEXTURE_2D_RECT_EXT ))

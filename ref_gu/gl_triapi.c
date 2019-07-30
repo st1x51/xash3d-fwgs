@@ -291,7 +291,7 @@ void TriFog( float flFogColor[3], float flStart, float flEnd, int bOn )
 	pglFogfv( GL_FOG_COLOR, RI.fogColor );
 	pglFogf( GL_FOG_START, RI.fogStart );
 	pglFogf( GL_FOG_END, RI.fogEnd );
-	pglHint( GL_FOG_HINT, GL_NICEST );
+	//pglHint( GL_FOG_HINT, GL_NICEST );
 }
 
 /*

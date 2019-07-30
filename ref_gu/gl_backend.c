@@ -193,13 +193,13 @@ void GL_SelectTexture( GLint tmu )
 
 	glState.activeTMU = tmu;
 
-	if( pglActiveTextureARB )
-	{
-		pglActiveTextureARB( tmu + GL_TEXTURE0_ARB );
+	//if( pglActiveTextureARB )
+	//{
+	//	pglActiveTextureARB( tmu + GL_TEXTURE0_ARB );
 
-		if( tmu < glConfig.max_texture_coords )
-			pglClientActiveTextureARB( tmu + GL_TEXTURE0_ARB );
-	}
+	//	if( tmu < glConfig.max_texture_coords )
+	//		pglClientActiveTextureARB( tmu + GL_TEXTURE0_ARB );
+	//}
 }
 
 /*
@@ -267,7 +267,7 @@ void GL_MultiTexCoord2f( GLenum texture, GLfloat s, GLfloat t )
 #ifndef XASH_GL_STATIC
 	if( pglMultiTexCoord2f != NULL )
 #endif
-		pglMultiTexCoord2f( texture + GL_TEXTURE0_ARB, s, t );
+		//pglMultiTexCoord2f( texture + GL_TEXTURE0_ARB, s, t );
 }
 
 /*

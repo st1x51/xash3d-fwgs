@@ -495,7 +495,7 @@ static void R_SetupFrame( void )
 	RI.viewplanedist = DotProduct( RI.vieworg, RI.vforward );
 
 	// NOTE: this request is the fps-killer on some NVidia drivers
-	glState.isFogEnabled = pglIsEnabled( GL_FOG );
+	//glState.isFogEnabled = pglIsEnabled( GL_FOG );
 
 	if( !gl_nosort->value )
 	{
@@ -559,7 +559,7 @@ void R_SetupGL( qboolean set_gl_state )
 		clip[2] = p->normal[2];
 		clip[3] = -p->dist;
 
-		pglClipPlane( GL_CLIP_PLANE0, clip );
+		//pglClipPlane( GL_CLIP_PLANE0, clip );
 		pglEnable( GL_CLIP_PLANE0 );
 	}
 
@@ -672,8 +672,8 @@ static void R_CheckFog( void )
 	{
 		if( !MOVEVARS->fog_settings )
 		{
-			if( pglIsEnabled( GL_FOG ))
-				pglDisable( GL_FOG );
+			//if( pglIsEnabled( GL_FOG ))
+			//	pglDisable( GL_FOG );
 			RI.fogEnabled = false;
 			return;
 		}
@@ -800,7 +800,7 @@ void R_DrawFog( void )
 	else pglFogi( GL_FOG_MODE, GL_EXP );
 	pglFogf( GL_FOG_DENSITY, RI.fogDensity );
 	pglFogfv( GL_FOG_COLOR, RI.fogColor );
-	pglHint( GL_FOG_HINT, GL_NICEST );
+	//pglHint( GL_FOG_HINT, GL_NICEST );
 }
 
 /*
