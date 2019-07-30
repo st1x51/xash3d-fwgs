@@ -13,15 +13,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifdef __PSP__
-#include <pspkernel.h>
-#include "platform/psp/dlfcn.h"
-#include <pspctrl.h>
-PSP_MODULE_INFO("engine", 0, 1, 0);
-PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_KB(-2 * 1024);
-#endif
-
 #ifdef SINGLE_BINARY
 
 #include <stdlib.h>
@@ -102,6 +93,11 @@ int main( int argc, char** argv )
 		FS.chdir('/xash');
 	}catch(e){};);
 #endif
+#endif
+#ifdef __PSP__
+	int myargc = 1;
+  	argv[myargc++] = "-dev";
+	argv[myargc++] = "5";
 #endif
 
 	g_iArgc = argc;

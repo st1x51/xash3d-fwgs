@@ -11,6 +11,13 @@
 		"psp_library.h": "c",
 		"dlfcn.h": "c",
 		"stddef.h": "c",
-		"port.h": "c"
+		"port.h": "c",
+		"library.h": "c",
+		"typeinfo": "c",
+		"unistd.h": "c",
+		"stdlib.h": "c",
+		"limits.h": "c",
+		"gl_export.h": "c",
+		"const.h": "c"
 	}
 }

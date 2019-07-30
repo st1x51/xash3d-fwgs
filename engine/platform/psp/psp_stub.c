@@ -1,4 +1,5 @@
 #include "psp_stub.h"
+#include <stdio.h>
 
 int gethostname(char *name, size_t len)
 {
@@ -77,4 +78,16 @@ void Platform_ShellExecute( const char *path, const char *parms )
 int Platform_JoyInit( int numjoy )
 {
 	return 0;
+}
+
+__attribute__((__no_instrument_function__))
+void __cyg_profile_func_enter(void *func,  void *caller)
+{
+ 	printf("e %p %p %lu\n", func, caller, time(NULL) );
+}
+
+__attribute__((__no_instrument_function__))
+void __cyg_profile_func_exit(void *func, void *caller)
+{
+	printf("x %p %p %lu\n", func, caller, time(NULL) );
 }

@@ -168,6 +168,8 @@ Default build-depended cvar and constant values
 #ifndef DEFAULT_RENDERER
 	#ifdef __ANDROID__
 		#define DEFAULT_RENDERER "gles1"
+	#elif __PSP__
+		#define DEFAULT_RENDERER "gl"
 	#else
 		#define DEFAULT_RENDERER "gl"
 	#endif

@@ -4,6 +4,13 @@
 #include "library.h"
 #include "filesystem.h"
 #include "server.h"
+#include "dlfcn.h"
+#include <pspkernel.h>
+#include <pspctrl.h>
+
+PSP_MODULE_INFO("engine", 0, 1, 0);
+PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU);
+PSP_HEAP_SIZE_KB(-16 * 1024);
 
 qboolean COM_CheckLibraryDirectDependency( const char *name, const char *depname, qboolean directpath )
 {

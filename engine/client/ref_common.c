@@ -438,9 +438,12 @@ static qboolean R_LoadProgs( const char *name )
 	}
 #endif
 
-	FS_AllowDirectPaths( false );
+	FS_AllowDirectPaths( false ); 
 
-	if( ( GetRefAPI = (REFAPI)COM_GetProcAddress( ref.hInstance, "GetRefAPI" )) == NULL )
+	GetRefAPI = (REFAPI)COM_GetProcAddress( ref.hInstance, "GetRefAPI" );
+	printf("%p\n", GetRefAPI);
+
+	if( GetRefAPI == NULL )
 	{
 		COM_FreeLibrary( ref.hInstance );
 		Con_Reportf( "R_LoadProgs: can't init renderer API\n" );

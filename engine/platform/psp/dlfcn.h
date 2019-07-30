@@ -9,6 +9,8 @@ extern "C" {
 #include <stdio.h>
 #include <stdarg.h>
 
+#define MAX_DLNAMELEN 256
+
 #define RTLD_LAZY 0x0001
 #define RTLD_NOW  0x0002
 
@@ -24,23 +26,6 @@ typedef struct Dl_info_s
 	const char *dli_sname;
 	const void *dli_saddr;
 } Dl_info;
-
-typedef struct sysfuncs_s
-{
-	// mem
-	void* (*pfnSysMalloc)(size_t);
-	void* (*pfnSysCalloc)(size_t, size_t);
-	void* (*pfnSysRealloc)(void*, size_t);
-	void  (*pfnSysFree)(void*);
-	// i/o
-	FILE* (*pfnSysFopen)(const char*, const char*);
-	int (*pfnSysFclose)(FILE*);
-	int (*pfnSysFseek)(FILE*, long int, int);
-	long int (*pfnSysFtell)(FILE*);
-	int (*pfnSysFprintf)(FILE*, const char*, ...);
-	size_t (*pfnSysFread)(void*, size_t, size_t, FILE*);
-	size_t (*pfnSysFwrite)(const void*, size_t, size_t, FILE*);
-} sysfuncs_t;
 
 void *dlsym(void *handle, const char *symbol );
 void *dlopen(const char *name, int flag );

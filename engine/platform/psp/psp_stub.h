@@ -1,7 +1,7 @@
 #ifndef STUB_PSP_H
 #define STUB_PSP_H
 
-#include "common.h"
+#include "const.h"
 #include <fcntl.h> 
 
 int gethostname(char *name, size_t len);

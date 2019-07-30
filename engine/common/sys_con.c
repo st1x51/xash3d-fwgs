@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include <android/log.h>
 #endif
 
-#if !defined( _WIN32 ) && !defined( XASH_MOBILE_PLATFORM )
+#if !defined( _WIN32 ) && !defined( XASH_MOBILE_PLATFORM ) && !defined __PSP__
 #define XASH_COLORIZE_CONSOLE
 // use with caution, running engine in Qt Creator may cause a freeze in read() call
 // I was never encountered this bug anywhere else, so still enable by default
