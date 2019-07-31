@@ -10,7 +10,7 @@
 
 PSP_MODULE_INFO("engine", PSP_MODULE_USER, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_KB(-16 * 1024);
+PSP_HEAP_SIZE_KB(-2 * 1024);
 
 qboolean COM_CheckLibraryDirectDependency( const char *name, const char *depname, qboolean directpath )
 {

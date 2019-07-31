@@ -101,6 +101,7 @@ int main( int argc, char** argv )
 	#ifdef __PSP__
   	g_pszArgv[g_iArgc++] = "-dev";
 	g_pszArgv[g_iArgc++] = "5";
+	g_pszArgv[g_iArgc++] = "-nosound";
 	#endif
 
 #if TARGET_OS_IPHONE

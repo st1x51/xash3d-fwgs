@@ -5,7 +5,7 @@
 
 //const char *load_client_exports(dllexport_t* exp[]);
 //const char *load_server_exports(dllexport_t* exp[]);
-const char *load_refgu_exports(dllexport_t* exp[]);
+//const char *load_refgu_exports(dllexport_t* exp[]);
 
 typedef struct dll_s
 {
@@ -67,10 +67,10 @@ void *dlopen( const char *name, int flag )
 	new->handle = h;
 
 	int i = 0;
-	if(strstr(name, "ref_gl"))
-	{
-		printf("DLOPEN STATUS: %s\n", load_refgu_exports(&(new->exp)));
-	}
+//	if(strstr(name, "ref_gl"))
+//	{
+//		printf("DLOPEN STATUS: %s\n", load_refgu_exports(&(new->exp)));
+//	}
 	
 	new->refcnt = 1;
 

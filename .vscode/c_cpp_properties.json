@@ -4,10 +4,10 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-				"C:\\cygwin64\\usr\\local\\pspdev\\psp\\include",
-				"C:\\cygwin64\\usr\\local\\pspdev\\psp\\sdk\\include",
-				"C:\\cygwin64\\usr\\local\\pspdev\\lib\\gcc\\psp\\8.3.0\\include",
-				"C:\\cygwin64\\usr\\local\\pspdev\\lib\\gcc\\psp\\8.3.0\\include-fixed"
+				"D:\\Bohdan\\Software\\cygwin64\\usr\\local\\pspdev\\psp\\include",
+				"D:\\Bohdan\\Software\\cygwin64\\usr\\local\\pspdev\\psp\\sdk\\include",
+				"D:\\Bohdan\\Software\\cygwin64\\usr\\local\\pspdev\\lib\\gcc\\psp\\8.3.0\\include",
+				"D:\\Bohdan\\Software\\cygwin64\\usr\\local\\pspdev\\lib\\gcc\\psp\\8.3.0\\include-fixed"
             ],
             "defines": [
                 "_DEBUG",
@@ -17,7 +17,7 @@
 				"SINGLE_BINARY",
 				"XASH_GL_STATIC"
             ],
-            "compilerPath": "C:\\cygwin64\\usr\\local\\pspdev\\bin\\psp-gcc.exe",
+            "compilerPath": "D:\\Bohdan\\Software\\cygwin64\\usr\\local\\pspdev\\bin\\psp-gcc.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-x64"

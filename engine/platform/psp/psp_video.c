@@ -8,17 +8,17 @@
 #include <GLES/egl.h>
 #include <GLES/gl.h>
 
-EGLDisplay dpy;
-EGLConfig config;
-EGLint num_configs;
-EGLContext ctx;
-EGLSurface surface;
+static EGLDisplay dpy;
+static EGLConfig config;
+static EGLint num_configs;
+static EGLContext ctx;
+static EGLSurface surface;
 
 static const EGLint attrib_list [] = {
-	EGL_RED_SIZE, 4,
-	EGL_GREEN_SIZE, 4,
-	EGL_BLUE_SIZE, 4,
-	EGL_ALPHA_SIZE, 4,
+	EGL_RED_SIZE, 1,
+	EGL_GREEN_SIZE, 1,
+	EGL_BLUE_SIZE, 1,
+	EGL_ALPHA_SIZE, 0,
 	EGL_DEPTH_SIZE, 0,
 	EGL_NONE
 };
@@ -67,10 +67,10 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 	return rserr_ok;
 }
 
-void* GL_GetProcAddress( const char *name )
-{
-	return NULL;
-}
+//void* GL_GetProcAddress( const char *name )
+//{
+//	return NULL;
+//}
 
 qboolean R_Init_Video( const int type )
 {
@@ -91,6 +91,7 @@ qboolean R_Init_Video( const int type )
 
 void R_Free_Video( void )
 {
+	eglTerminate(dpy);
 	return;
 }
 

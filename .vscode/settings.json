@@ -18,6 +18,7 @@
 		"stdlib.h": "c",
 		"limits.h": "c",
 		"gl_export.h": "c",
-		"const.h": "c"
+		"const.h": "c",
+		"pspsdk.h": "c"
 	}
 }

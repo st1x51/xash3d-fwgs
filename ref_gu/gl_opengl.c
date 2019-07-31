@@ -420,6 +420,24 @@ static void GL_SetDefaultState( void )
 	tr.draw_stack_pos = 0;
 }
 
+#include <GLES/egl.h>
+#include <GLES/gl.h>
+
+static EGLDisplay dpy;
+static EGLConfig config;
+static EGLint num_configs;
+static EGLContext ctx;
+static EGLSurface surface;
+
+static const EGLint attrib_list [] = {
+	EGL_RED_SIZE, 1,
+	EGL_GREEN_SIZE, 1,
+	EGL_BLUE_SIZE, 1,
+	EGL_ALPHA_SIZE, 0,
+	EGL_DEPTH_SIZE, 0,
+	EGL_NONE
+};
+
 /*
 ===============
 GL_SetDefaults
@@ -427,8 +445,6 @@ GL_SetDefaults
 */
 static void GL_SetDefaults( void )
 {
-	pglFinish();
-
 	pglClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
 
 	pglDisable( GL_DEPTH_TEST );
