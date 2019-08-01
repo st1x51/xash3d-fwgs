@@ -16,6 +16,7 @@ except: from waflib.extras.fwgslib import get_flags_by_compiler
 from waflib import Logs
 import os
 import sys
+import subprocess
 
 # Output:
 #  CROSSCOMPILING -- set to true, if crosscompiling is enabled
@@ -232,10 +233,45 @@ class Android:
 				ldflags += ['-march=armv5te']
 		return ldflags
 
+class PSP:
+	ctx = None
+	pspdev = None
+	pspsdk = None
+	
+	def __init__(self, ctx):
+		self.ctx = ctx
+		self.pspdev = os.getenv("PSPDEV")
+
+		if not self.pspdev:
+			self.ctx.fatal('Set PSPDEV environment variable pointing to the root of PSP Toolchain!')	
+
+		psp_config = os.path.join(self.pspdev, 'bin', 'psp-config')
+		self.pspsdk = subprocess.check_output([psp_config, '--pspsdk-path'])
+	
+	def cc(self):
+		return os.path.abspath(os.path.join(self.pspdev, 'bin', 'psp-gcc'))
+
+	def cxx(self):
+		return os.path.abspath(os.path.join(self.pspdev, 'bin', 'psp-g++'))
+	
+	def cflags(self):
+		return ['-DPSP', '-D__PSP__', '-D_PSP_FW_VERSION=660']
+
+	def linkflags(self):
+		return []
+
+	def ldflags(self):
+		ldflags = ['-L' + os.path.join(self.pspsdk, 'lib')]
+		ldflags += ['-lc']
+		return ldflags
+
 def options(opt):
 	android = opt.add_option_group('Android options')
 	android.add_option('--android', action='store', dest='ANDROID_OPTS', default=None,
 		help='enable building for android, format: --android=<arch>,<toolchain>,<api>, example: --android=armeabi-v7a-hard,4.9,9')
+	psp = opt.add_option_group('PSP Options')
+	psp.add_option('--psp', action='store_true', dest='PSP_BUILD', default=False,
+		help='enable PSP build')
 
 def configure(conf):
 	if conf.options.ANDROID_OPTS:
@@ -272,6 +308,20 @@ def configure(conf):
 
 		# conf.env.ANDROID_OPTS = android
 		conf.env.DEST_OS2 = 'android'
+
+	if conf.options.PSP_BUILD:
+		psp = PSP(conf)
+		setattr(conf, 'psp', psp)
+		conf.environ['CC'] = psp.cc()
+		conf.environ['CXX'] = psp.cxx()
+		conf.env.CFLAGS += psp.cflags()
+		conf.env.CXXFLAGS += psp.cflags()
+		conf.env.LINKFLAGS += psp.linkflags()
+		conf.env.LDFLAGS += psp.ldflags()
+		conf.env.HAVE_M = True
+		conf.env.LIB_M = ['m']
+		conf.env.DEST_OS2 = 'psp'
+
 #	else:
 #		conf.load('compiler_c compiler_cxx') # Use host compiler :)
 

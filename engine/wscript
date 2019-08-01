@@ -29,6 +29,8 @@ def configure(conf):
 		conf.check_cc(lib='android')
 		conf.check_cc(lib='log')
 		conf.check_cc(lib='EGL')
+	elif conf.env.DEST_OS2 == 'psp':
+		pass
 	else:
 		conf.load('sdl2')
 		if not conf.env.HAVE_SDL2:

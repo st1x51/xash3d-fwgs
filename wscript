@@ -104,6 +104,9 @@ def configure(conf):
 		conf.options.NANOGL = True
 		conf.options.GLWES  = True
 		conf.options.GL     = False
+	
+	if conf.env.DEST_OS2 == 'psp':
+		conf.options.NO_VGUI = True
 
 	# We restrict 64-bit builds ONLY for Win/Linux/OSX running on Intel architecture
 	# Because compatibility with original GoldSrc
@@ -115,7 +118,7 @@ def configure(conf):
 		conf.env.BIT32_ALLOW64 = True
 	conf.env.BIT32_MANDATORY = not conf.env.BIT32_ALLOW64
 	conf.load('force_32bit')
-	if conf.env.DEST_OS2 != 'android':
+	if conf.env.DEST_OS2 not in ['psp', 'android']:
 		conf.load('sdl2')
 
 	linker_flags = {
@@ -193,7 +196,7 @@ def configure(conf):
 		conf.check_cc( lib='dl' )
 
 	if conf.env.DEST_OS != 'win32':
-		if conf.env.DEST_OS2 != 'android':
+		if conf.env.DEST_OS2 not in ['android', 'psp']:
 			conf.check_cc( lib='m' ) # HACK: already added in xcompile!
 			conf.check_cc( lib='pthread' )
 	else:
@@ -224,7 +227,7 @@ def configure(conf):
 		if conf.env.SINGLE_BINARY and i.singlebin:
 			continue
 
-		if conf.env.DEST_OS2 == 'android' and i.singlebin:
+		if conf.env.DEST_OS2 in ['android', 'psp'] and i.singlebin:
 			continue
 
 		if conf.env.DEDICATED and i.dedicated:
@@ -237,7 +240,7 @@ def build(bld):
 		if bld.env.SINGLE_BINARY and i.singlebin:
 			continue
 
-		if bld.env.DEST_OS2 == 'android' and i.singlebin:
+		if bld.env.DEST_OS2 in ['android', 'psp'] and i.singlebin:
 			continue
 
 		if bld.env.DEDICATED and i.dedicated:
