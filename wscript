@@ -97,6 +97,11 @@ def configure(conf):
 		conf.env.append_unique('CFLAGS_cstlib', '-fPIC')
 		conf.env.append_unique('CXXFLAGS_cxxstlib', '-fPIC')
 
+	if conf.env.DEST_OS2 == 'psp':
+		conf.env.LINKFLAGS.remove('-Wl,--enable-auto-import')
+		conf.env.CFLAGS_cshlib.remove('-fPIC')
+		conf.env.CFLAGS_cstlib.remove('-fPIC')
+
 	# modify options dictionary early
 	if conf.env.DEST_OS2 == 'android':
 		conf.options.ALLOW64 = True # skip pointer length check

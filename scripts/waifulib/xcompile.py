@@ -255,13 +255,15 @@ class PSP:
 		return os.path.abspath(os.path.join(self.pspdev, 'bin', 'psp-g++'))
 	
 	def cflags(self):
-		return ['-DPSP', '-D__PSP__', '-D_PSP_FW_VERSION=660']
+		cflags = ['-DPSP', '-D__PSP__', '-D_PSP_FW_VERSION=660']
+		cflags += ['-I{}'.format(os.path.join(self.pspsdk, 'include'))]
+		return cflags
 
 	def linkflags(self):
 		return []
 
 	def ldflags(self):
-		ldflags = ['-L' + os.path.join(self.pspsdk, 'lib')]
+		ldflags = ['-L{}'.format(os.path.join(self.pspsdk, 'lib'))]
 		ldflags += ['-lc']
 		return ldflags
 

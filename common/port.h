@@ -21,7 +21,11 @@ GNU General Public License for more details.
 
 #if !defined(_WIN32)
 	#include <limits.h>
+	#if defined(XASH_PSP)
+	#include "platform/psp/psp_library.h"
+	#else
 	#include <dlfcn.h>
+	#endif
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <string.h>
