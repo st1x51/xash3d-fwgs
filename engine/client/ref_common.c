@@ -15,7 +15,7 @@ convar_t *r_adjust_fov;
 convar_t *gl_wgl_msaa_samples;
 convar_t *gl_clear;
 
-void R_GetTextureParms_( int *w, int *h, int texnum )
+void R_GetTextureParms( int *w, int *h, int texnum )
 {
 	if( w ) *w = REF_GET_PARM( PARM_TEX_WIDTH, texnum );
 	if( h ) *h = REF_GET_PARM( PARM_TEX_HEIGHT, texnum );
@@ -416,16 +416,15 @@ static void CL_FillTriAPIFromRef( triangleapi_t *dst, const ref_interface_t *src
 	dst->FogParams         = src->FogParams;
 }
 
-int EXPORT GetRefAPI( int version, ref_interface_t *funcs, ref_api_t *engfuncs, ref_globals_t *globals );
-
+#ifndef __PSP__
 static qboolean R_LoadProgs( const char *name )
 {
 	extern triangleapi_t gTriApi;
 	static ref_api_t gpEngfuncs;
-	//REFAPI GetRefAPI; // single export
+	REFAPI GetRefAPI; // single export
 
-	//if( ref.hInstance ) R_UnloadProgs();
-/*
+	if( ref.hInstance ) R_UnloadProgs();
+
 #ifdef XASH_INTERNAL_GAMELIBS
 	if( !(ref.hInstance = COM_LoadLibrary( name, false, true ) ))
 	{
@@ -447,15 +446,15 @@ static qboolean R_LoadProgs( const char *name )
 		ref.hInstance = NULL;
 		return false;
 	}
-*/
+
 	// make local copy of engfuncs to prevent overwrite it with user dll
 	memcpy( &gpEngfuncs, &gEngfuncs, sizeof( gpEngfuncs ));
 
 	if( !GetRefAPI( REF_API_VERSION, &ref.dllFuncs, &gpEngfuncs, &refState ) )
 	{
-		//COM_FreeLibrary( ref.hInstance );
+		COM_FreeLibrary( ref.hInstance );
 		Con_Reportf( "R_LoadProgs: can't init renderer API: wrong version\n" );
-		//ref.hInstance = NULL;
+		ref.hInstance = NULL;
 		return false;
 	}
 
@@ -476,8 +475,40 @@ static qboolean R_LoadProgs( const char *name )
 
 	return true;
 }
+#else
+int GetRefAPI( int version, ref_interface_t *funcs, ref_api_t *engfuncs, ref_globals_t *globals );
 
-void R_Shutdown_( void )
+static qboolean R_LoadProgs( const char *name )
+{
+	extern triangleapi_t gTriApi;
+	static ref_api_t gpEngfuncs;
+
+	memcpy( &gpEngfuncs, &gEngfuncs, sizeof( gpEngfuncs ));
+
+	if( !GetRefAPI( REF_API_VERSION, &ref.dllFuncs, &gpEngfuncs, &refState ) )
+	{
+		Con_Reportf( "R_LoadProgs: can't init renderer API: wrong version\n" );
+		return false;
+	}
+
+	refState.developer = host_developer.value;
+
+	if( !ref.dllFuncs.R_Init( ) )
+	{
+		Con_Reportf( "R_LoadProgs: can't init renderer!\n" );
+		return false;
+	}
+
+	Cvar_FullSet( "host_refloaded", "1", FCVAR_READ_ONLY );
+	ref.initialized = true;
+	
+	CL_FillTriAPIFromRef( &gTriApi, &ref.dllFuncs );
+	return true;
+}
+
+#endif
+
+void R_Shutdown( void )
 {
 	int i;
 	model_t *mod;
@@ -508,7 +539,7 @@ void R_GetRendererName( char *dest, size_t size, const char *refdll )
 		refdll, OS_LIB_EXT );
 }
 
-qboolean R_Init_( void )
+qboolean R_Init( void )
 {
 	string refopt, refdll;
 

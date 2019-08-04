@@ -25,7 +25,11 @@ GNU General Public License for more details.
 #ifndef _WIN32
 #include <unistd.h>
 #include <signal.h>
+#if defined(__PSP__)
+#include "platform/psp/psp_library.h"
+#else
 #include <dlfcn.h>
+#endif
 
 #ifndef __ANDROID__
 #include <pwd.h>

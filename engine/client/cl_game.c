@@ -3108,7 +3108,7 @@ TriAPI implementation
 TriRenderMode
 =================
 */
-void TriRenderMode_( int mode )
+void TriRenderMode( int mode )
 {
 	clgame.ds.renderMode = mode;
 	ref.dllFuncs.TriRenderMode( mode );
@@ -3119,7 +3119,7 @@ void TriRenderMode_( int mode )
 TriColor4f
 =================
 */
-void TriColor4f_( float r, float g, float b, float a )
+void TriColor4f( float r, float g, float b, float a )
 {
 	if( clgame.ds.renderMode == kRenderTransAlpha )
 		ref.dllFuncs.Color4ub( r * 255.9f, g * 255.9f, b * 255.9f, a * 255.0f );
@@ -3136,7 +3136,7 @@ void TriColor4f_( float r, float g, float b, float a )
 TriColor4ub
 =============
 */
-void TriColor4ub_( byte r, byte g, byte b, byte a )
+void TriColor4ub( byte r, byte g, byte b, byte a )
 {
 	clgame.ds.triRGBA[0] = r * (1.0f / 255.0f);
 	clgame.ds.triRGBA[1] = g * (1.0f / 255.0f);
@@ -3152,7 +3152,7 @@ TriBrightness
 =============
 */
 
-void TriBrightness_( float brightness )
+void TriBrightness( float brightness )
 {
 	float	r, g, b;
 
@@ -3168,7 +3168,7 @@ void TriBrightness_( float brightness )
 TriCullFace
 =============
 */
-void TriCullFace_( TRICULLSTYLE style )
+void TriCullFace( TRICULLSTYLE style )
 {
 	clgame.ds.cullMode = style;
 	ref.dllFuncs.CullFace( style );
@@ -3180,7 +3180,7 @@ TriWorldToScreen
 convert world coordinates (x,y,z) into screen (x, y)
 =============
 */
-int TriWorldToScreen_( const float *world, float *screen )
+int TriWorldToScreen( const float *world, float *screen )
 {
 	int	retval;
 
@@ -3249,7 +3249,7 @@ TriSpriteTexture
 bind current texture
 =============
 */
-int TriSpriteTexture_( model_t *pSpriteModel, int frame )
+int TriSpriteTexture( model_t *pSpriteModel, int frame )
 {
 	int	gl_texturenum;
 

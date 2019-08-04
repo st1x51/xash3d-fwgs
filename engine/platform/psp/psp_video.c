@@ -67,10 +67,10 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 	return rserr_ok;
 }
 
-//void* GL_GetProcAddress( const char *name )
-//{
-//	return NULL;
-//}
+void* GL_GetProcAddress( const char *name )
+{
+	return NULL;
+}
 
 qboolean R_Init_Video( const int type )
 {

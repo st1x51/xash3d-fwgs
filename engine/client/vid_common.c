@@ -191,8 +191,6 @@ static void SetFullscreenModeFromCommandLine( )
 #endif
 }
 
-qboolean R_Init_( void );
-
 void VID_Init()
 {
 	// system screen width and height (don't suppose for change from console at all)
@@ -217,5 +215,5 @@ void VID_Init()
 	SetWidthAndHeightFromCommandLine();
 	SetFullscreenModeFromCommandLine();
 
-	R_Init_(); // init renderer
+	R_Init(); // init renderer
 }

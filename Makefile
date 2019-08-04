@@ -33,8 +33,7 @@ OBJS = $(CFILES:.c=.o)
 INCDIR = $(INCLUDES)
 CFLAGS = -DSINGLE_BINARY -DXASH_NO_ASYNC_NS_RESOLVE -DPATH_MAX=256 -D__PSP__ -finline-limit=10 \
 	-g -G0 -Werror=implicit-function-declaration -Werror=return-type -Werror=parentheses -fvisibility=hidden -Os
-LIBS = -lc -lstdc++ -lpspaudio -lpspvram -lpspgum -lpspgu -lpsphprm -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk \
-	-Lref_gl -lref_gl -lglu -lgl -lpspvfpu -lpsprtc -lm -lpspnet_inet -lpspnet_apctl -lpspnet_resolver -lpsplibc -lpsputility -lpspuser -lpspkernel
+LIBS = -Lref_gl -lref_gl -lm -lgl -lpspvfpu -lpsprtc
 
 BUILD_PRX = 1
 PSP_FW_VERSION = 660

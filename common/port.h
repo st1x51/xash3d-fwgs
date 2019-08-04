@@ -21,11 +21,11 @@ GNU General Public License for more details.
 
 #if !defined(_WIN32)
 	#include <limits.h>
-	#if defined(XASH_PSP)
+#if defined(__PSP__)
 	#include "platform/psp/psp_library.h"
-	#else
+#else
 	#include <dlfcn.h>
-	#endif
+#endif
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <string.h>
@@ -55,9 +55,9 @@ GNU General Public License for more details.
 	#else
 	#endif
 
-	#if defined(__PSP__)
+#if defined(__PSP__)
 	#include "platform/psp/psp_stub.h"
-	#endif
+#endif
 
 	#define VGUI_SUPPORT_DLL "libvgui_support." OS_LIB_EXT
 
