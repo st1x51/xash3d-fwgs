@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "mathlib.h"
 #ifdef _WIN32
 // Winsock
-#include <WS2tcpip.h>
+#include <ws2tcpip.h>
 #else
 // BSD sockets
 #include <sys/types.h>
@@ -360,7 +360,7 @@ void *NET_ThreadStart( void *unused )
 #define mutex_lock EnterCriticalSection
 #define mutex_unlock LeaveCriticalSection
 #define detach_thread( x ) CloseHandle(x)
-#define create_thread( pfn ) nsthread.thread = CreateThread( NULL, 0, pfn, NULL, 0, NULL )
+#define create_thread( pfn ) (nsthread.thread = CreateThread( NULL, 0, pfn, NULL, 0, NULL ))
 #define mutex_t  CRITICAL_SECTION
 #define thread_t HANDLE
 DWORD WINAPI NET_ThreadStart( LPVOID unused )
@@ -390,15 +390,6 @@ static struct nsthread_s
 = { PTHREAD_MUTEX_INITIALIZER, PTHREAD_MUTEX_INITIALIZER }
 #endif
 ;
-
-#ifdef _WIN32
-static void NET_InitializeCriticalSections( void )
-{
-	net.threads_initialized = true;
-	pInitializeCriticalSection( &nsthread.mutexns );
-	pInitializeCriticalSection( &nsthread.mutexres );
-}
-#endif
 
 void NET_ResolveThread( void )
 {
@@ -2468,7 +2459,7 @@ static void HTTP_Clear_f( void )
 			FS_Close( file->file );
 
 		if( file->socket != -1 )
-			close ( file->socket );
+			closesocket( file->socket );
 
 		Mem_Free( file );
 	}
