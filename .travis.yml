@@ -176,27 +176,27 @@ jobs:
         - ccache --show-stats
         - mv xashdroid.apk xashdroid-softfp-test.apk
         - sh ../scripts/continious_upload.sh xashdroid-softfp-test.apk
-#    - # ...
-#      name: "Build for Windows MinGW"
-#      cache: ccache
-#      os: linux
-#      dist: xenial
-#      addons:
-#        apt:
-#          packages:
-#            - mingw-w64-i686-dev
-#            - binutils-mingw-w64-i686
-#            - gcc-mingw-w64-i686
-#            - g++-mingw-w64-i686
-#            - p7zip-full
-#      before_script:
-#        - sh scripts/travis_common_deps.sh
-#        - sh scripts/travis_mingw_deps.sh
-#      script:
-#        - sh scripts/build_mingw_engine.sh
-#      after_script:
-#        - ccache --show-stats
-#        - sh scripts/continious_upload.sh xash3d-mingw.7z
+    - # ...
+      name: "Build for Windows MinGW"
+      cache: ccache
+      os: linux
+      dist: xenial
+      addons:
+        apt:
+          packages:
+            - mingw-w64-i686-dev
+            - binutils-mingw-w64-i686
+            - gcc-mingw-w64-i686
+            - g++-mingw-w64-i686
+            - p7zip-full
+      before_script:
+        - sh scripts/travis_common_deps.sh
+        - sh scripts/travis_mingw_deps.sh
+      script:
+        - sh scripts/build_mingw_engine.sh
+      after_script:
+        - ccache --show-stats
+        - sh scripts/continious_upload.sh xash3d-mingw.7z
 #    - # ...
 #      name: "Build for OSX"
 #      cache: ccache
