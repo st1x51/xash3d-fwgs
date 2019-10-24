@@ -94,27 +94,6 @@ jobs:
         - ccache --show-stats
         - sh ../scripts/continious_upload.sh xashdroid.apk
     - # ...
-<<<<<<< HEAD
-      name: "Build for Windows MinGW"
-      cache: ccache
-      os: linux
-      dist: xenial
-      addons:
-        apt:
-          packages:
-            - mingw-w64-i686-dev
-            - binutils-mingw-w64-i686
-            - gcc-mingw-w64-i686
-            - g++-mingw-w64-i686
-            - p7zip-full
-      before_script:
-        - sh scripts/travis_common_deps.sh
-        - sh scripts/travis_mingw_deps.sh
-      script:
-        - sh scripts/build_mingw_engine.sh
-      after_script:
-        - ccache --show-stats
-=======
       name: "Build for Android 64"
       cache: ccache
       os: linux
@@ -217,7 +196,6 @@ jobs:
 #        - sh scripts/build_mingw_engine.sh
 #      after_script:
 #        - ccache --show-stats
->>>>>>> 8905e7cbb7c95f690a95458087f52d6307b9e8eb
 #        - sh scripts/continious_upload.sh xash3d-mingw.7z
 #    - # ...
 #      name: "Build for OSX"
