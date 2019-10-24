@@ -95,9 +95,11 @@ def configure(conf):
 	# TODO: wrapper around bld.stlib, bld.shlib and so on?
 	conf.env.MSVC_SUBSYSTEM = 'WINDOWS,5.01'
 	conf.env.MSVC_TARGETS = ['x86'] # explicitly request x86 target for MSVC
-	if sys.platform == 'win32':
-		conf.load('msvcfix msdev msvs')
+
 	conf.load('xcompile compiler_c compiler_cxx gitversion clang_compilation_database strip_on_install')
+
+	if conf.env.COMPILER_CC == 'msvc':
+		conf.load('msvcfix msdev msvs')
 
 	# Every static library must have fPIC
 	if conf.env.DEST_OS != 'win32' and '-fPIC' in conf.env.CFLAGS_cshlib:
@@ -131,6 +133,9 @@ def configure(conf):
 			'gcc':   ['-fsanitize=undefined', '-fsanitize=address'],
 		}
 	}
+
+	if conf.env.DEST_OS == 'win32':
+		linker_flags['common']['gcc'].append('-Wl,--allow-multiple-definition')
 
 	compiler_c_cxx_flags = {
 		'common': {
