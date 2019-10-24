@@ -85,7 +85,7 @@ static qboolean CL_QuakeEntityTeleported( cl_entity_t *ent, entity_state_t *news
 	VectorSubtract( newstate->origin, ent->prevstate.origin, delta );
 
 	// compute potential max movement in units per frame and compare with entity movement
-	maxlen = ( clgame.movevars.maxvelocity * ( 1.0 / GAME_FPS ));
+	maxlen = ( clgame.movevars.maxvelocity * ( 1.0f / GAME_FPS ));
 	len = VectorLength( delta );
 
 	return (len > maxlen);
@@ -248,9 +248,7 @@ static void CL_ParseQuakeServerInfo( sizebuf_t *msg )
 	S_StopBackgroundTrack ();
 
 	if( !cls.changedemo )
-	{
-		// UI_SetActiveMenu( cl.background );
-	}
+		UI_SetActiveMenu( cl.background );
 	else if( !cls.demoplayback )
 		Key_SetKeyDest( key_menu );
 

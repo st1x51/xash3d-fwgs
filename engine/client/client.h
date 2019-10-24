@@ -607,7 +607,7 @@ typedef struct
 
 	// demo recording info must be here, so it isn't clearing on level change
 	qboolean		demorecording;
-	qboolean		demoplayback;
+	int			demoplayback;
 	qboolean		demowaiting;		// don't record until a non-delta message is received
 	qboolean		timedemo;
 	string		demoname;			// for demo looping
@@ -689,8 +689,9 @@ extern convar_t	*scr_loading;
 extern convar_t	*v_dark;	// start from dark
 extern convar_t	*net_graph;
 extern convar_t	*rate;
-extern convar_t *m_ignore;
-extern convar_t *r_showtree;
+extern convar_t	*m_ignore;
+extern convar_t	*r_showtree;
+extern convar_t	*ui_renderworld;
 
 //=============================================================================
 

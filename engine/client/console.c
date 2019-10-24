@@ -596,7 +596,7 @@ static qboolean Con_LoadVariableWidthFont( const char *fontname, cl_font_t *font
 		if( buffer && length >= sizeof( qfont_t ))
 		{
 			src = (qfont_t *)buffer;
-			font->charHeight = src->rowheight * con_fontscale->value;;
+			font->charHeight = src->rowheight * con_fontscale->value;
 			font->type = FONT_VARIABLE;
 
 			// build rectangles
@@ -606,7 +606,7 @@ static qboolean Con_LoadVariableWidthFont( const char *fontname, cl_font_t *font
 				font->fontRc[i].right = font->fontRc[i].left + src->fontinfo[i].charwidth;
 				font->fontRc[i].top = (word)src->fontinfo[i].startoffset / fontWidth;
 				font->fontRc[i].bottom = font->fontRc[i].top + src->rowheight;
-				font->charWidths[i] = src->fontinfo[i].charwidth * con_fontscale->value;;
+				font->charWidths[i] = src->fontinfo[i].charwidth * con_fontscale->value;
 			}
 			font->valid = true;
 		}
@@ -1937,9 +1937,8 @@ void Con_DrawDebug( void )
 
 	if( scr_download->value != -1.0f )
 	{
-		UI_ConnectionProgress_Download( host.downloadfile, "server", NULL, 1, host.downloadcount, "(direct)" );
 		Q_snprintf( dlstring, sizeof( dlstring ), "Downloading [%d remaining]: ^2%s^7 %5.1f%% time %.f secs",
-			host.downloadcount, host.downloadfile, scr_download->value, Sys_DoubleTime() - timeStart );
+		host.downloadcount, host.downloadfile, scr_download->value, Sys_DoubleTime() - timeStart ); 
 		x = refState.width - 500;
 		y = con.curFont->charHeight * 1.05f;
 		Con_DrawString( x, y, dlstring, g_color_table[7] );

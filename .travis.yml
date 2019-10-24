@@ -37,6 +37,7 @@ jobs:
             - libstdc++6:i386
             - libfuse2:i386
             - zlib1g:i386
+            - unzip
       before_script:
         - export ARCH=i686
         - sh scripts/travis_common_deps.sh
@@ -62,6 +63,7 @@ jobs:
             - libasound-dev
             - libstdc++6
             - libfuse2
+            - unzip
       before_script:
         - export ARCH=x86_64
         - sh scripts/travis_common_deps.sh
@@ -87,11 +89,12 @@ jobs:
         - export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk-bundle
       script:
         - cd android
-        - sh compile.sh
+        - sh compile.sh release
       after_script:
         - ccache --show-stats
         - sh ../scripts/continious_upload.sh xashdroid.apk
     - # ...
+<<<<<<< HEAD
       name: "Build for Windows MinGW"
       cache: ccache
       os: linux
@@ -111,6 +114,110 @@ jobs:
         - sh scripts/build_mingw_engine.sh
       after_script:
         - ccache --show-stats
+=======
+      name: "Build for Android 64"
+      cache: ccache
+      os: linux
+      dist: xenial
+      language: java # we want xenial, so just java, not android
+      jdk: openjdk8
+      before_script:
+        - export ANDROID_HOME=$TRAVIS_BUILD_DIR/sdk
+        - sh scripts/travis_common_deps.sh
+        - sh scripts/travis_android_deps.sh
+        - export ANDROID_SDK_HOME=$ANDROID_HOME
+        - export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk-bundle
+      script:
+        - cd android
+        - export ARCHS="aarch64 x86_64"
+        - sh compile.sh release
+      after_script:
+        - ccache --show-stats
+        - mv xashdroid.apk xashdroid-64-test.apk
+        - sh ../scripts/continious_upload.sh xashdroid-64-test.apk
+    - # ...
+      name: "Build for Android arm hardfp"
+      cache: ccache
+      os: linux
+      dist: xenial
+      language: java # we want xenial, so just java, not android
+      jdk: openjdk8
+      addons:
+        apt:
+          packages:
+            - clang-9
+            - lld-9
+            - p7zip-full
+          sources:
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+      before_script:
+        - export ANDROID_HOME=$TRAVIS_BUILD_DIR/sdk
+        - sh scripts/travis_common_deps.sh
+        - sh scripts/travis_android_deps.sh r10e
+        - export ANDROID_SDK_HOME=$ANDROID_HOME
+        - export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk-bundle
+      script:
+        - cd android
+        - export ARCHS="armeabi-v7a-hard"
+        - export TOOLCHAIN="host"
+        - sh compile.sh release
+      after_script:
+        - ccache --show-stats
+        - mv xashdroid.apk xashdroid-hardfp-test.apk
+        - sh ../scripts/continious_upload.sh xashdroid-hardfp-test.apk
+    - # ...
+      name: "Build for Android arm softfp w/ polly"
+      cache: ccache
+      os: linux
+      dist: xenial
+      language: java # we want xenial, so just java, not android
+      jdk: openjdk8
+      addons:
+        apt:
+          packages:
+            - clang-9
+            - lld-9
+            - p7zip-full
+          sources:
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+      before_script:
+        - export ANDROID_HOME=$TRAVIS_BUILD_DIR/sdk
+        - sh scripts/travis_common_deps.sh
+        - sh scripts/travis_android_deps.sh
+        - export ANDROID_SDK_HOME=$ANDROID_HOME
+        - export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk-bundle
+      script:
+        - cd android
+        - export ARCHS="armeabi-v7a"
+        - export TOOLCHAIN="host"
+        - sh compile.sh release
+      after_script:
+        - ccache --show-stats
+        - mv xashdroid.apk xashdroid-softfp-test.apk
+        - sh ../scripts/continious_upload.sh xashdroid-softfp-test.apk
+#    - # ...
+#      name: "Build for Windows MinGW"
+#      cache: ccache
+#      os: linux
+#      dist: xenial
+#      addons:
+#        apt:
+#          packages:
+#            - mingw-w64-i686-dev
+#            - binutils-mingw-w64-i686
+#            - gcc-mingw-w64-i686
+#            - g++-mingw-w64-i686
+#            - p7zip-full
+#      before_script:
+#        - sh scripts/travis_common_deps.sh
+#        - sh scripts/travis_mingw_deps.sh
+#      script:
+#        - sh scripts/build_mingw_engine.sh
+#      after_script:
+#        - ccache --show-stats
+>>>>>>> 8905e7cbb7c95f690a95458087f52d6307b9e8eb
 #        - sh scripts/continious_upload.sh xash3d-mingw.7z
 #    - # ...
 #      name: "Build for OSX"
@@ -139,4 +246,4 @@ jobs:
       os: linux
       cache: false
       script:
-        - sh scripts/travis-deploy.sh xash3d-fwgs-i686.AppImage xash3d-fwgs-x86_64.AppImage xash3d-vc.7z xash3d-vc2008-sln.7z xashdroid.apk xashds-linux-i686 xashds-linux-x86_64
+        - sh scripts/travis-deploy.sh xash3d-fwgs-i686.AppImage xash3d-fwgs-x86_64.AppImage xash3d-vc.7z xash3d-vc2008-sln.7z xashdroid.apk xashdroid-64-test.apk xashdroid-hardfp-test.apk xashdroid-softfp-test.apk xashds-linux-i686 xashds-linux-x86_64

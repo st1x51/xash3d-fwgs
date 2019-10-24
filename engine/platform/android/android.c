@@ -181,7 +181,7 @@ Lock event queue and return pointer to next event.
 Caller must do Android_PushEvent() to unlock queue after setting parameters.
 ========================
 */
-event_t *Android_AllocEvent()
+event_t *Android_AllocEvent( void )
 {
 	Android_Lock();
 	if( events.count == ANDROID_MAX_EVENTS )
@@ -220,7 +220,7 @@ DECLARE_JNI_INTERFACE( int, nativeInit, jobject array )
 	/* Prepare the arguments. */
 
 	int len = (*env)->GetArrayLength(env, array);
-	char* argv[1 + len + 1];
+	char** argv = calloc( 1 + len + 1, sizeof( char ** ));
 	argc = 0;
 	argv[argc++] = strdup("app_process");
 	for (i = 0; i < len; ++i) {
@@ -267,6 +267,7 @@ DECLARE_JNI_INTERFACE( int, nativeInit, jobject array )
 
 	for (i = 0; i < argc; ++i)
 		free(argv[i]);
+	free(argv);
 
 	return status;
 }
@@ -417,6 +418,7 @@ DECLARE_JNI_INTERFACE( void, nativeBall, jint id, jbyte ball, jshort xrel, jshor
 
 DECLARE_JNI_INTERFACE( void, nativeHat, jint id, jbyte hat, jbyte key, jboolean down )
 {
+	event_t *event = Android_AllocEvent();
 	static byte engineKeys;
 
 	if( !key )
@@ -427,7 +429,6 @@ DECLARE_JNI_INTERFACE( void, nativeHat, jint id, jbyte hat, jbyte key, jboolean 
 	else
 		engineKeys &= ~key;
 
-	event_t *event = Android_AllocEvent();
 	event->type = event_joyhat;
 	event->arg = id;
 	event->hat.hat = hat;
@@ -583,7 +584,7 @@ Android_Init
 Initialize android-related cvars
 ========================
 */
-void Android_Init()
+void Android_Init( void )
 {
 	android_sleep = Cvar_Get( "android_sleep", "1", FCVAR_ARCHIVE, "Enable sleep in background" );
 }
@@ -657,12 +658,14 @@ Android_GetAndroidID
 const char *Android_GetAndroidID( void )
 {
 	static char id[65];
+	const char *resultCStr;
+	jstring resultJNIStr;
 
 	if( id[0] )
 		return id;
 
-	jstring resultJNIStr = (jstring)(*jni.env)->CallStaticObjectMethod( jni.env, jni.actcls, jni.getAndroidId );
-	const char *resultCStr = (*jni.env)->GetStringUTFChars( jni.env, resultJNIStr, NULL );
+	resultJNIStr = (jstring)(*jni.env)->CallStaticObjectMethod( jni.env, jni.actcls, jni.getAndroidId );
+	resultCStr = (*jni.env)->GetStringUTFChars( jni.env, resultJNIStr, NULL );
 	Q_strncpy( id, resultCStr, 64 );
 	(*jni.env)->ReleaseStringUTFChars( jni.env, resultJNIStr, resultCStr );
 
@@ -794,7 +797,7 @@ Android_RunEvents
 Execute all events from queue
 ========================
 */
-void Platform_RunEvents()
+void Platform_RunEvents( void )
 {
 	int i;
 

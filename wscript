@@ -3,13 +3,15 @@
 # a1batross, mittorn, 2018
 
 from __future__ import print_function
-from waflib import Logs
+from waflib import Logs, Context, Configure
 import sys
 import os
 
 VERSION = '0.99'
 APPNAME = 'xash3d-fwgs'
 top = '.'
+
+Context.Context.line_just = 55 # should fit for everything on 80x26
 
 class Subproject:
 	name      = ''
@@ -42,19 +44,25 @@ def options(opt):
 		help = 'build type: debug, release or none(custom flags)')
 
 	grp.add_option('-d', '--dedicated', action = 'store_true', dest = 'DEDICATED', default = False,
-		help = 'build Xash Dedicated Server(XashDS)')
+		help = 'build Xash Dedicated Server [default: %default]')
 
 	grp.add_option('--single-binary', action = 'store_true', dest = 'SINGLE_BINARY', default = False,
-		help = 'build single "xash" binary instead of xash.dll/libxash.so (forced for dedicated)')
+		help = 'build single "xash" binary (always enabled for dedicated) [default: %default]')
 
 	grp.add_option('-8', '--64bits', action = 'store_true', dest = 'ALLOW64', default = False,
-		help = 'allow targetting 64-bit engine')
+		help = 'allow targetting 64-bit engine(Linux/Windows/OSX x86 only) [default: %default]')
 
 	grp.add_option('-W', '--win-style-install', action = 'store_true', dest = 'WIN_INSTALL', default = False,
-		help = 'install like Windows build, ignore prefix, useful for development')
+		help = 'install like Windows build, ignore prefix, useful for development [default: %default]')
 
 	grp.add_option('--enable-bsp2', action = 'store_true', dest = 'SUPPORT_BSP2_FORMAT', default = False,
-		help = 'build engine and renderers with BSP2 map support(recommended for Quake, breaks compability!)')
+		help = 'build engine and renderers with BSP2 map support(recommended for Quake, breaks compatibility!) [default: %default]')
+
+	grp.add_option('--enable-lto', action = 'store_true', dest = 'LTO', default = False,
+		help = 'enable Link Time Optimization [default: %default]')
+
+	grp.add_option('--enable-poly-opt', action = 'store_true', dest = 'POLLY', default = False,
+		help = 'enable polyhedral optimization if possible [default: %default]')
 
 	opt.load('subproject')
 
@@ -64,27 +72,6 @@ def options(opt):
 	if sys.platform == 'win32':
 		opt.load('msdev msvs')
 	opt.load('reconfigure')
-
-
-def filter_cflags(conf, flags, required_flags, cxx):
-	supported_flags = []
-	check_flags = required_flags + ['-Werror']
-	conf.msg('Detecting supported flags for %s' % ('C++' if cxx else 'C'),'...')
-	
-	for flag in flags:
-		conf.start_msg('Checking for %s' % flag)
-		try:
-			if cxx:
-				conf.check_cxx(cxxflags = [flag] + check_flags)
-			else:
-				conf.check_cc(cflags = [flag] + check_flags)
-		except conf.errors.ConfigurationError:
-			conf.end_msg('no', color='YELLOW')
-		else:
-			conf.end_msg('yes')
-			supported_flags.append(flag)
-
-	return supported_flags
 
 def configure(conf):
 	conf.load('fwgslib reconfigure')
@@ -119,7 +106,6 @@ def configure(conf):
 
 	# modify options dictionary early
 	if conf.env.DEST_OS == 'android':
-		conf.options.ALLOW64 = True # skip pointer length check
 		conf.options.NO_VGUI = True # skip vgui
 		conf.options.NANOGL = True
 		conf.options.GLWES  = True
@@ -128,24 +114,21 @@ def configure(conf):
 	# We restrict 64-bit builds ONLY for Win/Linux/OSX running on Intel architecture
 	# Because compatibility with original GoldSrc
 	if conf.env.DEST_OS in ['win32', 'linux', 'darwin'] and conf.env.DEST_CPU in ['x86_64']:
-		conf.env.BIT32_ALLOW64 = conf.options.ALLOW64
-		if not conf.env.BIT32_ALLOW64:
+		conf.env.BIT32_MANDATORY = not conf.options.ALLOW64
+		if not conf.env.BIT32_MANDATORY:
 			Logs.info('WARNING: will build engine for 32-bit target')
 	else:
-		conf.env.BIT32_ALLOW64 = True
-	conf.env.BIT32_MANDATORY = not conf.env.BIT32_ALLOW64
+		conf.env.BIT32_MANDATORY = False
 	conf.load('force_32bit')
-	if conf.env.DEST_OS != 'android' and not conf.options.DEDICATED:
-		conf.load('sdl2')
 
 	linker_flags = {
 		'common': {
-			'msvc':    ['/DEBUG'], # always create PDB, doesn't affect result binaries
-			'gcc': ['-Wl,--no-undefined']
+			'msvc':  ['/DEBUG'], # always create PDB, doesn't affect result binaries
+			'gcc':   ['-Wl,--no-undefined']
 		},
 		'sanitize': {
-			'clang':   ['-fsanitize=undefined', '-fsanitize=address'],
-			'gcc':     ['-fsanitize=undefined', '-fsanitize=address'],
+			'clang': ['-fsanitize=undefined', '-fsanitize=address'],
+			'gcc':   ['-fsanitize=undefined', '-fsanitize=address'],
 		}
 	}
 
@@ -153,8 +136,8 @@ def configure(conf):
 		'common': {
 			# disable thread-safe local static initialization for C++11 code, as it cause crashes on Windows XP
 			'msvc':    ['/D_USING_V110_SDK71_', '/Zi', '/FS', '/Zc:threadSafeInit-', '/MT'],
-			'clang': ['-g', '-gdwarf-2', '-fvisibility=hidden'],
-			'gcc': ['-g', '-fvisibility=hidden']
+			'clang':   ['-g', '-gdwarf-2', '-fvisibility=hidden'],
+			'gcc':     ['-g', '-fvisibility=hidden']
 		},
 		'fast': {
 			'msvc':    ['/O2', '/Oy'], #todo: check /GL /LTCG
@@ -185,26 +168,77 @@ def configure(conf):
 
 	compiler_optional_flags = [
 		'-fdiagnostics-color=always',
-		'-Werror=implicit-function-declaration',
-		'-Werror=int-conversion',
 		'-Werror=return-type',
 		'-Werror=parentheses',
+		'-Werror=vla',
+		'-Werror=tautological-compare',
+		'-Werror=duplicated-cond',
+		'-Werror=duplicated-branches', # BEWARE: buggy
+		'-Werror=bool-compare',
+		'-Werror=bool-operation',
+		'-Wdouble-promotion',
+		'-Wstrict-aliasing',
 	]
 
-	conf.env.append_unique('LINKFLAGS', conf.get_flags_by_type(
-		linker_flags, conf.options.BUILD_TYPE, conf.env.COMPILER_CC))
+	c_compiler_optional_flags = [
+		'-Werror=implicit-function-declaration',
+		'-Werror=int-conversion',
+		'-Werror=implicit-int',
+		'-Werror=strict-prototypes',
+		'-Werror=old-style-declaration',
+		'-Werror=old-style-definition',
+		'-Werror=declaration-after-statement'
+	]
 
-	cflags = conf.get_flags_by_type(compiler_c_cxx_flags, conf.options.BUILD_TYPE, conf.env.COMPILER_CC)
-	if conf.env.COMPILER_CC == 'msvc':
-		conf.env.append_unique('CFLAGS', cflags)
-		conf.env.append_unique('CXXFLAGS', cflags)
-	else:
+	linkflags = conf.get_flags_by_type(linker_flags, conf.options.BUILD_TYPE, conf.env.COMPILER_CC)
+	cflags    = conf.get_flags_by_type(compiler_c_cxx_flags, conf.options.BUILD_TYPE, conf.env.COMPILER_CC)
+
+	# Here we don't differentiate C or C++ flags
+	if conf.options.LTO:
+		lto_cflags = {
+			'msvc':  ['/GL'],
+			'gcc':   ['-flto'],
+			'clang': ['-flto']
+		}
+
+		lto_linkflags = {
+			'msvc':  ['/LTCG'],
+			'gcc':   ['-flto'],
+			'clang': ['-flto']
+		}
+		cflags    += conf.get_flags_by_compiler(lto_cflags, conf.env.COMPILER_CC)
+		linkflags += conf.get_flags_by_compiler(lto_linkflags, conf.env.COMPILER_CC)
+
+	if conf.options.POLLY:
+		polly_cflags = {
+			'gcc':   ['-fgraphite-identity'],
+			'clang': ['-mllvm', '-polly']
+			# msvc sosat :(
+		}
+
+		cflags   += conf.get_flags_by_compiler(polly_cflags, conf.env.COMPILER_CC)
+
+	# And here C++ flags starts to be treated separately
+	cxxflags = list(cflags)
+	if conf.env.COMPILER_CC != 'msvc':
 		conf.check_cc(cflags=cflags, msg= 'Checking for required C flags')
 		conf.check_cxx(cxxflags=cflags, msg= 'Checking for required C++ flags')
-	
-		conf.env.append_unique('CFLAGS', cflags + filter_cflags(conf, compiler_optional_flags, cflags, False))
-		conf.env.append_unique('CXXFLAGS', cflags + filter_cflags(conf, compiler_optional_flags, cflags, True))
 
+		cxxflags += conf.filter_cxxflags(compiler_optional_flags, cflags)
+		cflags += conf.filter_cflags(compiler_optional_flags + c_compiler_optional_flags, cflags)
+
+	conf.env.append_unique('CFLAGS', cflags)
+	conf.env.append_unique('CXXFLAGS', cxxflags)
+	conf.env.append_unique('LINKFLAGS', linkflags)
+
+	# check if we can use C99 tgmath
+	if conf.check_cc(header_name='tgmath.h', mandatory=False):
+		tgmath_usable = conf.check_cc(fragment='''#include<tgmath.h>
+			int main(void){ return (int)sin(2.0f); }''',
+			msg='Checking if tgmath.h is usable', mandatory=False)
+		conf.define_cond('HAVE_TGMATH_H', tgmath_usable)
+	else:
+		conf.undefine('HAVE_TGMATH_H')
 
 	conf.env.DEDICATED     = conf.options.DEDICATED
 	# we don't need game launcher on dedicated
@@ -223,14 +257,26 @@ def configure(conf):
 		# Don't check them more than once, to save time
 		# Usually, they are always available
 		# but we need them in uselib
-		conf.check_cc( lib='user32' )
-		conf.check_cc( lib='shell32' )
-		conf.check_cc( lib='gdi32' )
-		conf.check_cc( lib='advapi32' )
-		conf.check_cc( lib='dbghelp' )
-		conf.check_cc( lib='psapi' )
-		conf.check_cc( lib='ws2_32' )
+		a = map(lambda x: {
+			# 'features': 'c',
+			# 'message': '...' + x,
+			'lib': x,
+			# 'uselib_store': x.upper(),
+			# 'global_define': False,
+		}, [
+			'user32',
+			'shell32',
+			'gdi32',
+			'advapi32',
+			'dbghelp',
+			'psapi',
+			'ws2_32'
+		])
 
+		for i in a:
+			conf.check_cc(**i)
+
+		# conf.multicheck(*a, run_all_tests = True, mandatory = True)
 
 	# indicate if we are packaging for Linux/BSD
 	if(not conf.options.WIN_INSTALL and
@@ -239,7 +285,7 @@ def configure(conf):
 	else:
 		conf.env.LIBDIR = conf.env.BINDIR = conf.env.PREFIX
 
-	conf.env.append_unique('DEFINES', 'XASH_BUILD_COMMIT="{0}"'.format(conf.env.GIT_VERSION if conf.env.GIT_VERSION else 'notset'))
+	conf.define('XASH_BUILD_COMMIT', conf.env.GIT_VERSION if conf.env.GIT_VERSION else 'notset')
 
 	for i in SUBDIRS:
 		if conf.env.SINGLE_BINARY and i.singlebin:

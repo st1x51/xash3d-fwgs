@@ -167,7 +167,7 @@ convar_t *touch_joy_texture;
 convar_t *touch_emulate;
 
 // code looks smaller with it
-#define B(x) button->x
+#define B(x) (button->x)
 #define SCR_W ((float)refState.width)
 #define SCR_H ((float)refState.height)
 #define TO_SCRN_Y(x) (refState.height * (x))
@@ -876,18 +876,18 @@ void Touch_DeleteProfile_f( void )
 
 void Touch_InitEditor( void )
 {
-	float x = 0.1 * (SCR_H/SCR_W);
-	float y = 0.05;
+	float x = 0.1f * (SCR_H/SCR_W);
+	float y = 0.05f;
 
 	Touch_ClearList( &touch.list_edit );
 
-	Touch_AddButton( &touch.list_edit, "close", "touch_default/edit_close.tga", "touch_disableedit", 0, y, x, y + 0.1, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
-	Touch_AddButton( &touch.list_edit, "close", "#Close and save", "", x, y, x + 0.2, y + 0.1, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
-	y += 0.2;
-	Touch_AddButton( &touch.list_edit, "cancel", "touch_default/edit_reset.tga", "touch_reloadconfig", 0, y, x, y + 0.1, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
-	Touch_AddButton( &touch.list_edit, "close", "#Cancel and reset", "", x, y, x + 0.2, y + 0.1, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
-	y += 0.2;
-	touch.hidebutton = Touch_AddButton( &touch.list_edit, "showhide", "touch_default/edit_hide.tga", "touch_toggleselection", 0, y, x, y + 0.1, (byte*)"\xff\xff\xff\xff" );
+	Touch_AddButton( &touch.list_edit, "close", "touch_default/edit_close.tga", "touch_disableedit", 0, y, x, y + 0.1f, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
+	Touch_AddButton( &touch.list_edit, "close", "#Close and save", "", x, y, x + 0.2f, y + 0.1f, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
+	y += 0.2f;
+	Touch_AddButton( &touch.list_edit, "cancel", "touch_default/edit_reset.tga", "touch_reloadconfig", 0, y, x, y + 0.1f, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
+	Touch_AddButton( &touch.list_edit, "close", "#Cancel and reset", "", x, y, x + 0.2f, y + 0.1f, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
+	y += 0.2f;
+	touch.hidebutton = Touch_AddButton( &touch.list_edit, "showhide", "touch_default/edit_hide.tga", "touch_toggleselection", 0, y, x, y + 0.1f, (byte*)"\xff\xff\xff\xff" );
 	touch.hidebutton->flags |= TOUCH_FL_HIDE | TOUCH_FL_NOEDIT;
 }
 
@@ -1065,7 +1065,7 @@ void Touch_DrawTexture ( float x1, float y1, float x2, float y2, int texture, by
 
 #define GRID_COUNT_X ((int)touch_grid_count->value)
 #define GRID_COUNT_Y (((int)touch_grid_count->value) * SCR_H / SCR_W)
-#define GRID_X (1.0/GRID_COUNT_X)
+#define GRID_X (1.0f/GRID_COUNT_X)
 #define GRID_Y (SCR_W/SCR_H/GRID_COUNT_X)
 #define GRID_ROUND_X(x) ((float)round( x * GRID_COUNT_X ) / GRID_COUNT_X)
 #define GRID_ROUND_Y(x) ((float)round( x * GRID_COUNT_Y ) / GRID_COUNT_Y)
@@ -1439,13 +1439,13 @@ static void Touch_Motion( touchEventType type, int fingerID, float x, float y, f
 	{
 		touch.wheel_amount += touch.wheel_horizontal ? dx : dy;
 
-		if( touch.wheel_amount > 0.1 )
+		if( touch.wheel_amount > 0.1f )
 		{
 			Cbuf_AddText( touch.wheel_down );
 			touch.wheel_count++;
 			touch.wheel_amount = 0;
 		}
-		if( touch.wheel_amount < -0.1 )
+		if( touch.wheel_amount < -0.1f )
 		{
 			Cbuf_AddText( touch.wheel_up );
 			touch.wheel_count++;
@@ -1499,7 +1499,7 @@ static void Touch_Motion( touchEventType type, int fingerID, float x, float y, f
 			// save angle, modify only velocity
 			dabs = sqrt( dx * dx + dy * dy );
 
-			if( dabs < 0.000001 )
+			if( dabs < 0.000001f )
 				return; // no motion, avoid division by zero
 
 			dcos = dx / dabs;
@@ -1846,14 +1846,14 @@ int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx
 			{
 				static float y1 = 0;
 				y1 += dy;
-				if( dy > 0.4 )
+				if( dy > 0.4f )
 					Con_Bottom();
-				if( y1 > 0.01 )
+				if( y1 > 0.01f )
 				{
 					Con_PageUp( 1 );
 					y1 = 0;
 				}
-				if( y1 < -0.01 )
+				if( y1 < -0.01f )
 				{
 					Con_PageDown( 1 );
 					y1 = 0;

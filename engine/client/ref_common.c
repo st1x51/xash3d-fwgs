@@ -434,6 +434,7 @@ static qboolean R_LoadProgs( const char *name )
 	if( !(ref.hInstance = COM_LoadLibrary( name, false, true ) ))
 	{
 		FS_AllowDirectPaths( false );
+		Con_Reportf( "R_LoadProgs: can't load renderer library %s: %s\n", name, COM_GetLibraryError() );
 		return false;
 	}
 
@@ -442,7 +443,7 @@ static qboolean R_LoadProgs( const char *name )
 	if( !( GetRefAPI = (REFAPI)COM_GetProcAddress( ref.hInstance, GET_REF_API )) )
 	{
 		COM_FreeLibrary( ref.hInstance );
-		Con_Reportf( "R_LoadProgs: can't init renderer API\n" );
+		Con_Reportf( "R_LoadProgs: can't find GetRefAPI entry point in %s\n", name );
 		ref.hInstance = NULL;
 		return false;
 	}
@@ -501,20 +502,26 @@ static void R_GetRendererName( char *dest, size_t size, const char *opt )
 {
 	if( !Q_strstr( opt, va( ".%s", OS_LIB_EXT )))
 	{
-		// shortened renderer name
+		const char *format;
+
 #ifdef XASH_INTERNAL_GAMELIBS
-		Q_snprintf( dest, size, "ref_%s", opt );
+		if( !Q_strcmp( opt, "ref_" ))
+			format = "%s";
+		else
+			format = "ref_%s";
 #else
-		Q_snprintf( dest, size, "%sref_%s.%s",
-			OS_LIB_PREFIX, opt, OS_LIB_EXT );
+		if( !Q_strcmp( opt, "ref_" ))
+			format = OS_LIB_PREFIX "%s." OS_LIB_EXT;
+		else
+			format = OS_LIB_PREFIX "ref_%s." OS_LIB_EXT;
 #endif
-		Con_Printf( "Loading renderer by short name: %s\n", opt );
+		Q_snprintf( dest, size, format, opt );
+
 	}
 	else
 	{
 		// full path
 		Q_strcpy( dest, opt );
-		Con_Printf( "Loading renderer: %s\n", opt );
 	}
 }
 
@@ -523,6 +530,8 @@ static qboolean R_LoadRenderer( const char *refopt )
 	string refdll;
 
 	R_GetRendererName( refdll, sizeof( refdll ), refopt );
+
+	Con_Printf( "Loading renderer: %s -> %s\n", refopt, refdll );
 
 	if( !R_LoadProgs( refdll ))
 	{
@@ -536,7 +545,7 @@ static qboolean R_LoadRenderer( const char *refopt )
 	return true;
 }
 
-static void SetWidthAndHeightFromCommandLine()
+static void SetWidthAndHeightFromCommandLine( void )
 {
 	int width, height;
 
@@ -552,7 +561,7 @@ static void SetWidthAndHeightFromCommandLine()
 	R_SaveVideoMode( width, height );
 }
 
-static void SetFullscreenModeFromCommandLine( )
+static void SetFullscreenModeFromCommandLine( void )
 {
 #ifndef __ANDROID__
 	if ( Sys_CheckParm("-fullscreen") )
@@ -582,11 +591,15 @@ void R_CollectRendererNames( void )
 
 		dll = COM_LoadLibrary( temp, false, true );
 		if( !dll )
+		{
+			Con_Reportf( "R_CollectRendererNames: can't load library %s: %s\n", temp, COM_GetLibraryError() );
 			continue;
+		}
 
 		pfn = COM_GetProcAddress( dll, GET_REF_API );
 		if( !pfn )
 		{
+			Con_Reportf( "R_CollectRendererNames: can't find API entry point in %s\n", temp );
 			COM_FreeLibrary( dll );
 			continue;
 		}
@@ -596,6 +609,7 @@ void R_CollectRendererNames( void )
 		pfn = COM_GetProcAddress( dll, GET_REF_HUMANREADABLE_NAME );
 		if( !pfn ) // just in case
 		{
+			Con_Reportf( "R_CollectRendererNames: can't find GetHumanReadableName export in %s\n", temp, COM_GetLibraryError() );
 			Q_strncpy( ref.readableNames[i], renderers[i], sizeof( ref.readableNames[i] ));
 		}
 		else
@@ -609,7 +623,6 @@ void R_CollectRendererNames( void )
 
 		ref.numRenderers++;
 		COM_FreeLibrary( dll );
-		continue;
 	}
 }
 
@@ -665,6 +678,7 @@ qboolean R_Init( void )
 	if( !success )
 	{
 		Host_Error( "Can't initialize any renderer. Check your video drivers!" );
+		return false;
 	}
 
 	SCR_Init();

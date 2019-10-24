@@ -45,7 +45,7 @@ void V_CalcViewRect( void )
 		sb_lines = 24;		// no inventory
 	else sb_lines = 48;
 
-	if( scr_viewsize->value >= 100.0 )
+	if( scr_viewsize->value >= 100.0f )
 	{
 		full = true;
 		size = 100.0f;
@@ -58,7 +58,7 @@ void V_CalcViewRect( void )
 		sb_lines = 0;
 		full = true;
 	}
-	size /= 100.0;
+	size /= 100.0f;
 
 	clgame.viewport[2] = refState.width * size;
 	clgame.viewport[3] = refState.height * size;
@@ -315,7 +315,7 @@ void V_RenderView( void )
 	ref_viewpass_t	rvp;
 	int		viewnum = 0;
 
-	if( !cl.video_prepped || ( UI_IsVisible() && !cl.background ))
+	if( !cl.video_prepped || ( !ui_renderworld->value && UI_IsVisible() && !cl.background ))
 		return; // still loading
 
 	V_CalcViewRect ();	// compute viewport rectangle
@@ -416,7 +416,7 @@ void R_ShowTree_r( mnode_t *node, float x, float y, float scale, int shownodes, 
 void R_ShowTree( void )
 {
 	float	x = (float)((refState.width - (int)POINT_SIZE) >> 1);
-	float	y = NODE_INTERVAL_Y(1.0);
+	float	y = NODE_INTERVAL_Y(1.0f);
 	mleaf_t *viewleaf;
 
 	if( !cl.worldmodel || !CVAR_TO_BOOL( r_showtree ))
