@@ -1987,7 +1987,7 @@ static int pfnGetWindowCenterX( void )
 	}
 #endif
 
-#ifdef XASH_SDL
+#if XASH_SDL == 2
 	SDL_GetWindowPosition( host.hWnd, &x, NULL );
 #endif
 
@@ -2012,7 +2012,7 @@ static int pfnGetWindowCenterY( void )
 	}
 #endif
 
-#ifdef XASH_SDL
+#if XASH_SDL == 2
 	SDL_GetWindowPosition( host.hWnd, NULL, &y );
 #endif
 
