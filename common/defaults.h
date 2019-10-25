@@ -81,10 +81,30 @@ SETUP BACKENDS DEFINITIONS
 		#endif
 
 		#ifndef XASH_SOUND
-			#define XASH_SOUND SOUND_NULL
+			#define XASH_SOUND SOUND_ALSA
 		#endif
 		#define XASH_USE_EVDEV
-	#endif // android case
+	#endif // android case 
+			
+	#if defined __PSP__
+
+		#ifndef XASH_VIDEO
+			#define XASH_VIDEO VIDEO_PSP
+		#endif
+
+		#ifndef XASH_TIMER
+			#define XASH_TIMER TIMER_PSP
+		#endif
+
+		#ifndef XASH_INPUT
+			#define XASH_INPUT INPUT_NULL
+		#endif
+
+		#ifndef XASH_SOUND
+			#define XASH_SOUND SOUND_NULL
+		#endif
+
+	#endif
 
 #endif // XASH_DEDICATED
 
@@ -166,7 +186,13 @@ Default build-depended cvar and constant values
 
 #ifndef DEFAULT_ACCELERATED_RENDERER
 	#ifdef __ANDROID__
+<<<<<<< HEAD
 		#define DEFAULT_ACCELERATED_RENDERER "gles1"
+=======
+		#define DEFAULT_RENDERER "gles1"
+	#elif __PSP__
+		#define DEFAULT_RENDERER "gl"
+>>>>>>> old/master
 	#else
 		#define DEFAULT_ACCELERATED_RENDERER "gl"
 	#endif

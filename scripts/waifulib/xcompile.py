@@ -18,6 +18,7 @@ from waflib.Tools import c_config
 from collections import OrderedDict
 import os
 import sys
+import subprocess
 
 ANDROID_NDK_ENVVARS = ['ANDROID_NDK_HOME', 'ANDROID_NDK']
 ANDROID_NDK_SUPPORTED = [10, 19, 20]
@@ -311,10 +312,47 @@ class Android:
 				ldflags += ['-march=armv5te']
 		return ldflags
 
+class PSP:
+	ctx = None
+	pspdev = None
+	pspsdk = None
+	
+	def __init__(self, ctx):
+		self.ctx = ctx
+		self.pspdev = os.getenv("PSPDEV")
+
+		if not self.pspdev:
+			self.ctx.fatal('Set PSPDEV environment variable pointing to the root of PSP Toolchain!')	
+
+		psp_config = os.path.join(self.pspdev, 'bin', 'psp-config')
+		self.pspsdk = subprocess.check_output([psp_config, '--pspsdk-path'])
+	
+	def cc(self):
+		return os.path.abspath(os.path.join(self.pspdev, 'bin', 'psp-gcc'))
+
+	def cxx(self):
+		return os.path.abspath(os.path.join(self.pspdev, 'bin', 'psp-g++'))
+	
+	def cflags(self):
+		cflags = ['-DPSP', '-D__PSP__', '-D_PSP_FW_VERSION=660']
+		cflags += ['-I{}'.format(os.path.join(self.pspsdk, 'include'))]
+		return cflags
+
+	def linkflags(self):
+		return []
+
+	def ldflags(self):
+		ldflags = ['-L{}'.format(os.path.join(self.pspsdk, 'lib'))]
+		ldflags += ['-lc']
+		return ldflags
+
 def options(opt):
 	android = opt.add_option_group('Android options')
 	android.add_option('--android', action='store', dest='ANDROID_OPTS', default=None,
 		help='enable building for android, format: --android=<arch>,<toolchain>,<api>, example: --android=armeabi-v7a-hard,4.9,9')
+	psp = opt.add_option_group('PSP Options')
+	psp.add_option('--psp', action='store_true', dest='PSP_BUILD', default=False,
+		help='enable PSP build')
 
 def configure(conf):
 	if conf.options.ANDROID_OPTS:

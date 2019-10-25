@@ -97,6 +97,13 @@ int main( int argc, char** argv )
 
 	g_iArgc = argc;
 	g_pszArgv = argv;
+
+#ifdef __PSP__
+  	g_pszArgv[g_iArgc++] = "-dev";
+	g_pszArgv[g_iArgc++] = "5";
+	g_pszArgv[g_iArgc++] = "-nosound";
+#endif
+
 #if TARGET_OS_IPHONE
 	{
 		void IOS_LaunchDialog( void );

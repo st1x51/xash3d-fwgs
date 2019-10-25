@@ -138,7 +138,7 @@ static void R_GetDecalDimensions( int texture, int *width, int *height )
 	if( width ) *width = 1;	// to avoid divide by zero
 	if( height ) *height = 1;
 
-	R_GetTextureParms( width, height, texture );
+	_R_GetTextureParms( width, height, texture );
 }
 
 //-----------------------------------------------------------------------------

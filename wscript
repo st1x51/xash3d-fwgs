@@ -106,12 +106,20 @@ def configure(conf):
 		conf.env.append_unique('CFLAGS_cstlib', '-fPIC')
 		conf.env.append_unique('CXXFLAGS_cxxstlib', '-fPIC')
 
+	if conf.env.DEST_OS2 == 'psp':
+		conf.env.LINKFLAGS.remove('-Wl,--enable-auto-import')
+		conf.env.CFLAGS_cshlib.remove('-fPIC')
+		conf.env.CFLAGS_cstlib.remove('-fPIC')
+
 	# modify options dictionary early
 	if conf.env.DEST_OS == 'android':
 		conf.options.NO_VGUI = True # skip vgui
 		conf.options.NANOGL = True
 		conf.options.GLWES  = True
 		conf.options.GL     = False
+	
+	if conf.env.DEST_OS2 == 'psp':
+		conf.options.NO_VGUI = True
 
 	# We restrict 64-bit builds ONLY for Win/Linux/OSX running on Intel architecture
 	# Because compatibility with original GoldSrc

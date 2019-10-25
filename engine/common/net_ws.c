@@ -17,6 +17,11 @@ GNU General Public License for more details.
 #include "client.h" // ConnectionProgress
 #include "netchan.h"
 #include "mathlib.h"
+
+#ifdef __PSP__
+#include "platform/psp/psp_stub.h"
+#endif
+
 #ifdef _WIN32
 // Winsock
 #include <ws2tcpip.h>
@@ -45,7 +50,9 @@ GNU General Public License for more details.
 #define NET_MAX_FRAGMENTS		( NET_MAX_FRAGMENT / (SPLITPACKET_MIN_SIZE - sizeof( SPLITPACKET )) )
 
 #ifndef _WIN32 // not available in XP
+#ifndef __PSP__
 #define HAVE_GETADDRINFO
+#endif
 #define WSAGetLastError()  errno
 #define WSAEINTR           EINTR
 #define WSAEBADF           EBADF
@@ -84,7 +91,7 @@ GNU General Public License for more details.
 #define WSAENAMETOOLONG    ENAMETOOLONG
 #define WSAEHOSTDOWN       EHOSTDOWN
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) || defined(__PSP__)
 /* All socket operations are non-blocking already */
 static int ioctl_stub( int d, unsigned long r, ... )
 {
@@ -386,7 +393,7 @@ static struct nsthread_s
 	string  hostname;
 	qboolean busy;
 } nsthread
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__PSP__)
 = { PTHREAD_MUTEX_INITIALIZER, PTHREAD_MUTEX_INITIALIZER }
 #endif
 ;
@@ -1384,14 +1391,12 @@ static int NET_Isocket( const char *net_interface, int port, qboolean multicast 
 			Con_DPrintf( S_WARN "NET_UDsocket: port: %d socket: %s\n", port, NET_ErrorString( ));
 		return INVALID_SOCKET;
 	}
-
 	if( NET_IsSocketError( ioctlsocket( net_socket, FIONBIO, &_true ) ) )
 	{
 		Con_DPrintf( S_WARN "NET_UDsocket: port: %d ioctl FIONBIO: %s\n", port, NET_ErrorString( ));
 		closesocket( net_socket );
 		return INVALID_SOCKET;
 	}
-
 	// make it broadcast capable
 	if( NET_IsSocketError( setsockopt( net_socket, SOL_SOCKET, SO_BROADCAST, (char *)&_true, sizeof( _true ) ) ) )
 	{
@@ -1514,7 +1519,6 @@ void NET_GetLocalAddress( void )
 		else
 		{
 			gethostname( buff, 512 );
-
 			// ensure that it doesn't overrun the buffer
 			buff[511] = 0;
 		}

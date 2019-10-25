@@ -1044,7 +1044,7 @@ static void GL_TextureImageDXT( gl_texture_t *tex, GLint side, GLint level, GLin
 
 	Assert( tex != NULL );
 
-#ifndef XASH_GLES
+#if !defined(XASH_GLES) && !defined(__PSP__)
 	if( tex->target == GL_TEXTURE_1D )
 	{
 		if( subImage ) pglCompressedTexSubImage1DARB( tex->target, level, 0, width, tex->format, size, data );

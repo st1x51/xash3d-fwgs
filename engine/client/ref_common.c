@@ -422,6 +422,7 @@ static void CL_FillTriAPIFromRef( triangleapi_t *dst, const ref_interface_t *src
 	dst->FogParams         = src->FogParams;
 }
 
+#ifndef __PSP__
 static qboolean R_LoadProgs( const char *name )
 {
 	extern triangleapi_t gTriApi;
@@ -451,7 +452,7 @@ static qboolean R_LoadProgs( const char *name )
 	// make local copy of engfuncs to prevent overwrite it with user dll
 	memcpy( &gpEngfuncs, &gEngfuncs, sizeof( gpEngfuncs ));
 
-	if( !GetRefAPI( REF_API_VERSION, &ref.dllFuncs, &gpEngfuncs, &refState ))
+	if( !GetRefAPI( REF_API_VERSION, &ref.dllFuncs, &gpEngfuncs, &refState ) )
 	{
 		COM_FreeLibrary( ref.hInstance );
 		Con_Reportf( "R_LoadProgs: can't init renderer API: wrong version\n" );
@@ -460,7 +461,6 @@ static qboolean R_LoadProgs( const char *name )
 	}
 
 	refState.developer = host_developer.value;
-
 	if( !ref.dllFuncs.R_Init( ) )
 	{
 		COM_FreeLibrary( ref.hInstance );
@@ -477,6 +477,38 @@ static qboolean R_LoadProgs( const char *name )
 
 	return true;
 }
+#else
+int GetRefAPI( int version, ref_interface_t *funcs, ref_api_t *engfuncs, ref_globals_t *globals );
+
+static qboolean R_LoadProgs( const char *name )
+{
+	extern triangleapi_t gTriApi;
+	static ref_api_t gpEngfuncs;
+
+	memcpy( &gpEngfuncs, &gEngfuncs, sizeof( gpEngfuncs ));
+
+	if( !GetRefAPI( REF_API_VERSION, &ref.dllFuncs, &gpEngfuncs, &refState ) )
+	{
+		Con_Reportf( "R_LoadProgs: can't init renderer API: wrong version\n" );
+		return false;
+	}
+
+	refState.developer = host_developer.value;
+
+	if( !ref.dllFuncs.R_Init( ) )
+	{
+		Con_Reportf( "R_LoadProgs: can't init renderer!\n" );
+		return false;
+	}
+
+	Cvar_FullSet( "host_refloaded", "1", FCVAR_READ_ONLY );
+	ref.initialized = true;
+	
+	CL_FillTriAPIFromRef( &gTriApi, &ref.dllFuncs );
+	return true;
+}
+
+#endif
 
 void R_Shutdown( void )
 {

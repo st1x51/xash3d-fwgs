@@ -3153,6 +3153,7 @@ void TriColor4ub( byte r, byte g, byte b, byte a )
 TriBrightness
 =============
 */
+
 void TriBrightness( float brightness )
 {
 	float	r, g, b;

@@ -378,12 +378,12 @@ qboolean GL_CheckExtension( const char *name, const dllfunc_t *funcs, const char
 
 /*
 ==============
-GL_GetProcAddress
+_GL_GetProcAddress
 
 defined just for nanogl/glwes, so it don't link to SDL2 directly, nor use dlsym
 ==============
 */
-void GAME_EXPORT *GL_GetProcAddress( const char *name )
+void GAME_EXPORT *_GL_GetProcAddress( const char *name )
 {
 	return gEngfuncs.GL_GetProcAddress( name );
 }
@@ -887,10 +887,10 @@ void GL_RemoveCommands( void )
 
 /*
 ===============
-R_Init
+_R_Init
 ===============
 */
-qboolean R_Init( void )
+qboolean _R_Init( void )
 {
 	if( glw_state.initialized )
 		return true;
@@ -926,10 +926,10 @@ qboolean R_Init( void )
 
 /*
 ===============
-R_Shutdown
+_R_Shutdown
 ===============
 */
-void R_Shutdown( void )
+void _R_Shutdown( void )
 {
 	if( !glw_state.initialized )
 		return;

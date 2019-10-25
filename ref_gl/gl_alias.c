@@ -1051,6 +1051,7 @@ void GL_DrawAliasFrame( aliashdr_t *paliashdr )
 
 		do
 		{
+#ifndef __PSP__
 			// texture coordinates come from the draw list
 			if( GL_Support( GL_ARB_MULTITEXTURE ) && glState.activeTMU > 0 )
 			{
@@ -1061,6 +1062,9 @@ void GL_DrawAliasFrame( aliashdr_t *paliashdr )
 			{
 				pglTexCoord2f( ((float *)order)[0], ((float *)order)[1] );
 			}
+#else
+			pglTexCoord2f( ((float *)order)[0], ((float *)order)[1] );
+#endif
 			order += 2;
 
 			VectorLerp( m_bytenormals[verts0->lightnormalindex], g_alias.lerpfrac, m_bytenormals[verts1->lightnormalindex], norm );
@@ -1274,14 +1278,14 @@ static void R_AliasDrawAbsBBox( cl_entity_t *e, const vec3_t absmin, const vec3_
 	}
 
 	GL_Bind( XASH_TEXTURE0, tr.whiteTexture );
-	TriColor4f( 0.5f, 0.5f, 1.0f, 0.5f );
-	TriRenderMode( kRenderTransAdd );
+	_TriColor4f( 0.5f, 0.5f, 1.0f, 0.5f );
+	_TriRenderMode( kRenderTransAdd );
 	pglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 	TriBegin( TRI_QUADS );
 	for( i = 0; i < 6; i++ )
 	{
-		TriBrightness( g_alias.shadelight / 255.0f );
+		_TriBrightness( g_alias.shadelight / 255.0f );
 		TriVertex3fv( p[boxpnt[i][0]] );
 		TriVertex3fv( p[boxpnt[i][1]] );
 		TriVertex3fv( p[boxpnt[i][2]] );
@@ -1289,7 +1293,7 @@ static void R_AliasDrawAbsBBox( cl_entity_t *e, const vec3_t absmin, const vec3_
 	}
 	TriEnd();
 
-	TriRenderMode( kRenderNormal );
+	_TriRenderMode( kRenderNormal );
 }
 
 static void R_AliasDrawLightTrace( cl_entity_t *e )
@@ -1453,19 +1457,19 @@ void R_DrawAliasModel( cl_entity_t *e )
 	}
 
 	pglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
+#ifndef __PSP__
 	if( GL_Support( GL_ARB_MULTITEXTURE ) && m_pAliasHeader->fb_texturenum[skin][anim] )
 	{
 		GL_Bind( XASH_TEXTURE1, m_pAliasHeader->fb_texturenum[skin][anim] );
 		pglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
 	}
-
+#endif
 	pglShadeModel( GL_SMOOTH );
 	R_SetupAliasFrame( e, m_pAliasHeader );
-
+#ifndef __PSP__
 	if( GL_Support( GL_ARB_MULTITEXTURE ) && m_pAliasHeader->fb_texturenum[skin][anim] )
 		GL_CleanUpTextureUnits( 1 );
-
+#endif
 	pglShadeModel( GL_FLAT );
 	R_LoadIdentity();
 

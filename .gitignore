@@ -51,7 +51,6 @@ Temporary Items
 ### CMake ###
 CMakeCache.txt
 CMakeFiles
-Makefile
 cmake_install.cmake
 install_manifest.txt
 # makedepend
@@ -64,7 +63,6 @@ ZERO_CHECK.*
 # Visual Studio
 *.obj
 *.dll
-*.exp
 *.lib
 *.suo
 *.sdf
@@ -327,3 +325,6 @@ __pycache__
 *.vcproj
 *.sln
 *.vcxproj
+
+# etc
+.vscode/*

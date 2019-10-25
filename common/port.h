@@ -20,7 +20,11 @@ GNU General Public License for more details.
 #include "build.h"
 
 #if !defined(_WIN32)
-	#include <dlfcn.h>
+	#if defined(__PSP__)
+		#include "platform/psp/psp_library.h"
+	#else
+		#include <dlfcn.h>
+	#endif
 	#include <unistd.h>
 
 	#define PATH_SPLITTER "/"
@@ -30,6 +34,8 @@ GNU General Public License for more details.
 		#include "TargetConditionals.h"
 		#define OS_LIB_EXT "dylib"
 		#define OPEN_COMMAND "open"
+	#elif defined(__PSP__)
+		#define OS_LIB_EXT "prx"
 	#else
 		#define OS_LIB_EXT "so"
 		#define OPEN_COMMAND "xdg-open"
@@ -45,6 +51,10 @@ GNU General Public License for more details.
 		//#endif
 	#else
 	#endif
+
+#if defined(__PSP__)
+	#include "platform/psp/psp_stub.h"
+#endif
 
 	#define VGUI_SUPPORT_DLL "libvgui_support." OS_LIB_EXT
 
