@@ -821,6 +821,7 @@ void Key_Init( void );
 void Key_WriteBindings( file_t *f );
 const char *Key_GetBinding( int keynum );
 void Key_SetBinding( int keynum, const char *binding );
+int Key_ToUpper( int keynum );
 void Key_ClearStates( void );
 const char *Key_KeynumToString( int keynum );
 int Key_StringToKeynum( const char *str );
