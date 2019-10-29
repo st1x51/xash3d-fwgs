@@ -1897,6 +1897,11 @@ void FS_LoadGameInfo( const char *rootfolder )
 	{
 		SI.clientlib[0] = 0;
 	}
+
+	if( !Sys_GetParmFromCmdLine( "-menulib", SI.menulib ) )
+	{
+		SI.menulib[0] = 0;
+	}
 	
 	FS_Rescan(); // create new filesystem
 

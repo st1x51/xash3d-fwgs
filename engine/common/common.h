@@ -252,6 +252,7 @@ typedef struct sysinfo_s
 	string		basedirName;	// name of base directory
 	string		gamedll;
 	string		clientlib;
+	string		menulib;
 	gameinfo_t	*GameInfo;	// current GameInfo
 	gameinfo_t	*games[MAX_MODS];	// environment games (founded at each engine start)
 	int		numgames;
