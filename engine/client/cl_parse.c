@@ -21,9 +21,9 @@ GNU General Public License for more details.
 #include "shake.h"
 #include "hltv.h"
 #include "input.h"
-
+#if XASH_LOW_MEMORY != 2
 int CL_UPDATE_BACKUP = SINGLEPLAYER_BACKUP;
-
+#endif
 /*
 ===============
 CL_UserMsgStub
@@ -92,7 +92,7 @@ void CL_ParseSoundPacket( sizebuf_t *msg )
 		char	sentenceName[32];
 
 		if( FBitSet( flags, SND_SEQUENCE ))
-			Q_snprintf( sentenceName, sizeof( sentenceName ), "!#%i", sound + MAX_SOUNDS );
+			Q_snprintf( sentenceName, sizeof( sentenceName ), "!#%i", sound + MAX_SOUNDS_NONSENTENCE );
 		else Q_snprintf( sentenceName, sizeof( sentenceName ), "!%i", sound );
 
 		handle = S_RegisterSound( sentenceName );
@@ -156,7 +156,7 @@ void CL_ParseRestoreSoundPacket( sizebuf_t *msg )
 		char	sentenceName[32];
 
 		if( flags & SND_SEQUENCE )
-			Q_snprintf( sentenceName, sizeof( sentenceName ), "!%i", sound + MAX_SOUNDS );
+			Q_snprintf( sentenceName, sizeof( sentenceName ), "!%i", sound + MAX_SOUNDS_NONSENTENCE );
 		else Q_snprintf( sentenceName, sizeof( sentenceName ), "!%i", sound );
 
 		handle = S_RegisterSound( sentenceName );
@@ -881,7 +881,7 @@ void CL_ParseServerData( sizebuf_t *msg )
 	cl.playernum = MSG_ReadByte( msg );
 	cl.maxclients = MSG_ReadByte( msg );
 	clgame.maxEntities = MSG_ReadWord( msg );
-	clgame.maxEntities = bound( 600, clgame.maxEntities, MAX_EDICTS );
+	clgame.maxEntities = bound( 30, clgame.maxEntities, MAX_EDICTS );
 	clgame.maxModels = MSG_ReadWord( msg );
 	Q_strncpy( clgame.mapname, MSG_ReadString( msg ), MAX_STRING );
 	Q_strncpy( clgame.maptitle, MSG_ReadString( msg ), MAX_STRING );
@@ -2394,7 +2394,7 @@ void CL_ParseLegacyServerData( sizebuf_t *msg )
 	cl.playernum = MSG_ReadByte( msg );
 	cl.maxclients = MSG_ReadByte( msg );
 	clgame.maxEntities = MSG_ReadWord( msg );
-	clgame.maxEntities = bound( 600, clgame.maxEntities, 4096 );
+	clgame.maxEntities = bound( 30, clgame.maxEntities, 4096 );
 	clgame.maxModels = 512;
 	Q_strncpy( clgame.mapname, MSG_ReadString( msg ), MAX_STRING );
 	Q_strncpy( clgame.maptitle, MSG_ReadString( msg ), MAX_STRING );
@@ -2724,7 +2724,9 @@ void CL_LegacyUpdateUserinfo( sizebuf_t *msg )
 	}
 	else memset( player, 0, sizeof( *player ));
 }
-
+#if XASH_LOW_MEMORY == 2
+#define MAX_RESOURCES 64
+#endif
 /*
 ==============
 CL_ParseResourceList
@@ -2739,7 +2741,7 @@ void CL_LegacyParseResourceList( sizebuf_t *msg )
 	{
 		int  rescount;
 		int  restype[MAX_RESOURCES];
-		char resnames[MAX_RESOURCES][CS_SIZE];
+		char resnames[MAX_RESOURCES][MAX_QPATH];
 	} reslist;
 	memset( &reslist, 0, sizeof( reslist ));
 
@@ -2748,7 +2750,7 @@ void CL_LegacyParseResourceList( sizebuf_t *msg )
 	for( i = 0; i < reslist.rescount; i++ )
 	{
 		reslist.restype[i] = MSG_ReadWord( msg );
-		Q_strncpy( reslist.resnames[i], MSG_ReadString( msg ), CS_SIZE );
+		Q_strncpy( reslist.resnames[i], MSG_ReadString( msg ), MAX_QPATH );
 	}
 
 	if( CL_IsPlaybackDemo() )
