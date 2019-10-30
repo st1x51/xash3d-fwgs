@@ -430,7 +430,7 @@ void Sys_Error( const char *error, ... )
 
 	if( !Host_IsDedicated() )
 	{
-#ifdef XASH_SDL
+#if XASH_SDL == 2
 		if( host.hWnd ) SDL_HideWindow( host.hWnd );
 #endif
 	}

@@ -768,8 +768,7 @@ void Key_EnableTextInput( qboolean enable, qboolean force )
 	else if( !enable )
 		Platform_EnableTextInput( false );
 
-	if( !force )
-		host.textmode = enable;
+	host.textmode = enable;
 }
 
 /*
@@ -1044,7 +1043,6 @@ static qboolean OSK_KeyEvent( int key, int down )
 }
 
 /*
-=============
 Joy_EnableTextInput
 
 Enables built-in IME
@@ -1141,4 +1139,22 @@ void OSK_Draw( void )
 	for( y = Y_START,     j = 0; j < MAX_OSK_LINES; j++, y += Y_STEP )
 		for( x = X_START, i = 0; i < MAX_OSK_ROWS;  i++, x += X_STEP )
 			OSK_DrawSymbolButton( curlayout[j][i], x, y, X_STEP, Y_STEP );
+}
+
+/*
+============
+Key_ToUpper
+
+A helper function if platform input doesn't support text mode properly
+============
+*/
+int Key_ToUpper( int keynum )
+{
+	keynum = Q_toupper( keynum );
+	if( keynum == '-' )
+		keynum = '_';
+	if( keynum == '=' )
+		keynum = '+';
+
+	return keynum;
 }

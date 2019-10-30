@@ -816,6 +816,25 @@ void HPAK_CheckIntegrity( const char *filename );
 void HPAK_CheckSize( const char *filename );
 void HPAK_FlushHostQueue( void );
 
+//
+// keys.c
+//
+int Key_IsDown( int keynum );
+const char *Key_IsBind( int keynum );
+void Key_Event( int key, int down );
+void Key_Init( void );
+void Key_WriteBindings( file_t *f );
+const char *Key_GetBinding( int keynum );
+void Key_SetBinding( int keynum, const char *binding );
+int Key_ToUpper( int keynum );
+void Key_ClearStates( void );
+const char *Key_KeynumToString( int keynum );
+int Key_StringToKeynum( const char *str );
+int Key_GetKey( const char *binding );
+void Key_EnumCmds_f( void );
+void Key_SetKeyDest( int key_dest );
+void Key_EnableTextInput( qboolean enable, qboolean force );
+
 #include "avi/avi.h"
 
 //
@@ -829,7 +848,7 @@ void HPAK_FlushHostQueue( void );
 
 // shared calls
 struct physent_s;
-typedef struct sv_client_s sv_client_t;
+struct sv_client_s;
 typedef struct sizebuf_s sizebuf_t;
 qboolean CL_IsInGame( void );
 qboolean CL_IsInMenu( void );
@@ -858,7 +877,7 @@ void SV_CreateDecal( sizebuf_t *msg, const float *origin, int decalIndex, int en
 void Log_Printf( const char *fmt, ... ) _format( 1 );
 void SV_BroadcastCommand( const char *fmt, ... ) _format( 1 );
 qboolean SV_RestoreCustomDecal( struct decallist_s *entry, edict_t *pEdict, qboolean adjacent );
-void SV_BroadcastPrintf( sv_client_t *ignore, char *fmt, ... ) _format( 2 );
+void SV_BroadcastPrintf( struct sv_client_s *ignore, char *fmt, ... ) _format( 2 );
 int R_CreateDecalList( struct decallist_s *pList );
 void R_ClearAllDecals( void );
 void CL_ClearStaticEntities( void );
@@ -959,14 +978,6 @@ byte TextureToGamma( byte b );
 void ID_Init( void );
 const char *ID_GetMD5( void );
 void GAME_EXPORT ID_SetCustomClientID( const char *id );
-
-//
-// sequence.c
-//
-typedef struct sequenceEntry_ sequenceEntry_s;
-typedef struct sentenceEntry_ sentenceEntry_s;
-sequenceEntry_s *Sequence_Get( const char *fileName, const char *entryName );
-sentenceEntry_s *Sequence_PickSentence( const char *groupName, int pickMethod, int *picked );
 
 //
 // masterlist.c
