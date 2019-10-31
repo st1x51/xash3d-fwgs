@@ -18,10 +18,6 @@ GNU General Public License for more details.
 #include "netchan.h"
 #include "mathlib.h"
 
-#ifdef __PSP__
-#include "platform/psp/psp_stub.h"
-#endif
-
 #ifdef _WIN32
 // Winsock
 #include <ws2tcpip.h>
@@ -36,6 +32,10 @@ GNU General Public License for more details.
 #include <netdb.h>
 #include <errno.h>
 #include <fcntl.h>
+#endif
+
+#ifdef __PSP__
+#include "psp_stub.h"
 #endif
 
 #define NET_USE_FRAGMENTS
@@ -393,7 +393,7 @@ static struct nsthread_s
 	string  hostname;
 	qboolean busy;
 } nsthread
-#if !defined(_WIN32) && !defined(__PSP__)
+#if !defined(_WIN32)
 = { PTHREAD_MUTEX_INITIALIZER, PTHREAD_MUTEX_INITIALIZER }
 #endif
 ;

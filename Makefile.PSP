@@ -1,4 +1,4 @@
-TARGET = xash
+TARGET = $(BUILD_DIR)/xash
 
 SOURCE_DIRS := \
 	engine/client \
@@ -31,15 +31,16 @@ INCLUDES := \
 CFILES := $(foreach dir,$(SOURCE_DIRS),$(addprefix $(dir)/,$(notdir $(wildcard $(dir)/*.c))))
 OBJS = $(CFILES:.c=.o)
 INCDIR = $(INCLUDES)
-CFLAGS = -DSINGLE_BINARY -DXASH_NO_ASYNC_NS_RESOLVE -DPATH_MAX=256 -D__PSP__ -finline-limit=10 \
-	-g -G0 -Werror=implicit-function-declaration -Werror=return-type -Werror=parentheses -fvisibility=hidden -Os
-LIBS = -Lref_gl -lref_gl -lm -lgl -lpspvfpu -lpsprtc
+CFLAGS = -DXASH_LOW_MEMORY=2 -DSINGLE_BINARY -DXASH_NO_ASYNC_NS_RESOLVE -DPATH_MAX=256 -D__PSP__ -finline-limit=10 \
+	-w -g -G0 -Werror=implicit-function-declaration -Werror=return-type -Werror=parentheses -fvisibility=hidden -Os
+LIBS = -lm -lgl -lpspvfpu -lpsprtc
 
 BUILD_PRX = 1
 PSP_FW_VERSION = 660
-EXTRA_TARGETS = EBOOT.PBP
+EXTRA_TARGETS = $(BUILD_DIR)/EBOOT.PBP
 PSP_EBOOT_TITLE = Xash3D
 PSP_LARGE_MEMORY = 1
+USE_NEWLIB_LIBC = 1
 
 PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak

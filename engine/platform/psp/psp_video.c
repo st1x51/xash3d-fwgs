@@ -58,8 +58,6 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 	Con_Reportf( "R_ChangeDisplaySettings: Setting video mode to %dx%d %s\n", width, height, fullscreen ? "fullscreen" : "windowed" );
 
 	glw_state.desktopBitsPixel = 16;
-	glw_state.desktopWidth = width;
-	glw_state.desktopHeight = height;
 	refState.fullScreen = fullscreen;
 
 	R_SaveVideoMode( width, height );

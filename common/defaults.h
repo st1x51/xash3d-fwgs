@@ -35,7 +35,7 @@ SETUP BACKENDS DEFINITIONS
 		#ifndef XASH_MESSAGEBOX
 			#define XASH_MESSAGEBOX MSGBOX_SDL
 		#endif
-	#else
+	#elif defined XASH_SDL
 		#ifndef XASH_TIMER
 			#define XASH_TIMER TIMER_LINUX
 		#endif
@@ -211,13 +211,7 @@ Default build-depended cvar and constant values
 
 #ifndef DEFAULT_ACCELERATED_RENDERER
 	#ifdef __ANDROID__
-<<<<<<< HEAD
 		#define DEFAULT_ACCELERATED_RENDERER "gles1"
-=======
-		#define DEFAULT_RENDERER "gles1"
-	#elif __PSP__
-		#define DEFAULT_RENDERER "gl"
->>>>>>> old/master
 	#else
 		#define DEFAULT_ACCELERATED_RENDERER "gl"
 	#endif

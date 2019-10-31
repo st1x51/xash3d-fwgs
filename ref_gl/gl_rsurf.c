@@ -29,7 +29,7 @@ typedef struct
 static int		nColinElim; // stats
 static vec2_t		world_orthocenter;
 static vec2_t		world_orthohalf;
-static uint		r_blocklights[BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*3];
+static uint		*r_blocklights = NULL;
 static mextrasurf_t		*fullbright_surfaces[MAX_TEXTURES];
 static mextrasurf_t		*detail_surfaces[MAX_TEXTURES];
 static int		rtable[MOD_FRAMES][MOD_FRAMES];
@@ -731,7 +731,11 @@ static void R_BuildLightMap( msurface_t *surf, byte *dest, int stride, qboolean 
 
 	lm = surf->samples;
 
-	memset( r_blocklights, 0, sizeof( uint ) * size * 3 );
+	//memset( r_blocklights, 0, sizeof( uint ) * size * 3 );
+	if(r_blocklights)
+		free(r_blocklights);
+	
+	r_blocklights = (uint)malloc(sizeof( uint ) * size * 3 );
 
 	// add all the lightmaps
 	for( map = 0; map < MAXLIGHTMAPS && surf->styles[map] != 255 && lm; map++ )

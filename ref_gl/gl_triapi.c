@@ -32,12 +32,12 @@ static struct
 */
 /*
 =============
-_TriRenderMode
+TriRenderMode
 
 set rendermode
 =============
 */
-void _TriRenderMode( int mode )
+void TriRenderMode( int mode )
 {
 	ds.renderMode = mode;
 	switch( mode )
@@ -122,22 +122,22 @@ void TriEnd( void )
 
 /*
 =============
-_TriColor4f_
+_TriColor4f
 
 =============
 */
-void _TriColor4f_( float r, float g, float b, float a )
+void _TriColor4f( float r, float g, float b, float a )
 {
 	pglColor4f( r, g, b, a );
 }
 
 /*
 =============
-_TriColor4f_
+_TriColor4f
 
 =============
 */
-void _TriColor4ub_( byte r, byte g, byte b, byte a )
+void _TriColor4ub( byte r, byte g, byte b, byte a )
 {
 	pglColor4ub( r, g, b, a );
 }
@@ -145,30 +145,30 @@ void _TriColor4ub_( byte r, byte g, byte b, byte a )
 
 /*
 =============
-_TriColor4ub
+TriColor4ub
 
 =============
 */
-void _TriColor4ub( byte r, byte g, byte b, byte a )
+void TriColor4ub( byte r, byte g, byte b, byte a )
 {
 	ds.triRGBA[0] = r * (1.0f / 255.0f);
 	ds.triRGBA[1] = g * (1.0f / 255.0f);
 	ds.triRGBA[2] = b * (1.0f / 255.0f);
 	ds.triRGBA[3] = a * (1.0f / 255.0f);
 
-	_TriColor4f_( ds.triRGBA[0], ds.triRGBA[1], ds.triRGBA[2], 1.0f );
+	_TriColor4f( ds.triRGBA[0], ds.triRGBA[1], ds.triRGBA[2], 1.0f );
 }
 
 /*
 =================
-_TriColor4f
+TriColor4f
 =================
 */
-void _TriColor4f( float r, float g, float b, float a )
+void TriColor4f( float r, float g, float b, float a )
 {
 	if( ds.renderMode == kRenderTransAlpha )
-		_TriColor4ub( r * 255.9f, g * 255.9f, b * 255.9f, a * 255.0f );
-	else _TriColor4f_( r * a, g * a, b * a, 1.0 );
+		TriColor4ub( r * 255.9f, g * 255.9f, b * 255.9f, a * 255.0f );
+	else _TriColor4f( r * a, g * a, b * a, 1.0 );
 
 	ds.triRGBA[0] = r;
 	ds.triRGBA[1] = g;
@@ -211,12 +211,12 @@ void TriVertex3f( float x, float y, float z )
 
 /*
 =============
-_TriWorldToScreen
+TriWorldToScreen
 
 convert world coordinates (x,y,z) into screen (x, y)
 =============
 */
-int _TriWorldToScreen( const float *world, float *screen )
+int TriWorldToScreen( const float *world, float *screen )
 {
 	int	retval;
 
@@ -232,12 +232,12 @@ int _TriWorldToScreen( const float *world, float *screen )
 
 /*
 =============
-_TriSpriteTexture
+TriSpriteTexture
 
 bind current texture
 =============
 */
-int _TriSpriteTexture( model_t *pSpriteModel, int frame )
+int TriSpriteTexture( model_t *pSpriteModel, int frame )
 {
 	int	gl_texturenum;
 
@@ -320,11 +320,11 @@ void TriFogParams( float flDensity, int iFogSkybox )
 
 /*
 =============
-_TriCullFace
+TriCullFace
 
 =============
 */
-void _TriCullFace( TRICULLSTYLE mode )
+void TriCullFace( TRICULLSTYLE mode )
 {
 	int glMode;
 
@@ -343,10 +343,10 @@ void _TriCullFace( TRICULLSTYLE mode )
 
 /*
 =============
-_TriBrightness
+TriBrightness
 =============
 */
-void _TriBrightness( float brightness )
+void TriBrightness( float brightness )
 {
 	float	r, g, b;
 
@@ -354,6 +354,6 @@ void _TriBrightness( float brightness )
 	g = ds.triRGBA[1] * ds.triRGBA[3] * brightness;
 	b = ds.triRGBA[2] * ds.triRGBA[3] * brightness;
 
-	_TriColor4f_( r, g, b, 1.0f );
+	_TriColor4f( r, g, b, 1.0f );
 }
 

@@ -447,7 +447,7 @@ void CL_DrawTracers( double frametime, particle_t *cl_active_tracers );
 // gl_sprite.c
 //
 void R_SpriteInit( void );
-void _Mod_LoadSpriteModel( model_t *mod, const void *buffer, qboolean *loaded, uint texFlags );
+void Mod_LoadSpriteModel( model_t *mod, const void *buffer, qboolean *loaded, uint texFlags );
 mspriteframe_t *R_GetSpriteFrame( const model_t *pModel, int frame, float yaw );
 void R_DrawSpriteModel( cl_entity_t *e );
 
@@ -510,8 +510,8 @@ int VGUI_GenerateTexture( void );
 //
 // renderer exports
 //
-qboolean _R_Init( void );
-void _R_Shutdown( void );
+qboolean R_Init( void );
+void R_Shutdown( void );
 void GL_SetupAttributes( int safegl );
 void GL_OnContextCreated( void );
 void GL_InitExtensions( void );
@@ -525,7 +525,7 @@ void R_BeginFrame( qboolean clearScene );
 void R_RenderFrame( const struct ref_viewpass_s *vp );
 void R_EndFrame( void );
 void R_ClearScene( void );
-void _R_GetTextureParms( int *w, int *h, int texnum );
+void R_GetTextureParms( int *w, int *h, int texnum );
 void R_GetSpriteParms( int *frameWidth, int *frameHeight, int *numFrames, int curFrame, const struct model_s *pSprite );
 void R_DrawStretchRaw( float x, float y, float w, float h, int cols, int rows, const byte *data, qboolean dirty );
 void R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, int texnum );
@@ -568,23 +568,23 @@ void GL_SetExtension( int r_ext, int enable );
 //
 // gl_triapi.c
 //
-void _TriRenderMode( int mode );
+void TriRenderMode( int mode );
 void TriBegin( int mode );
 void TriEnd( void );
 void TriTexCoord2f( float u, float v );
 void TriVertex3fv( const float *v );
 void TriVertex3f( float x, float y, float z );
-void _TriColor4f_( float r, float g, float b, float a );
-void _TriColor4ub_( byte r, byte g, byte b, byte a );
 void _TriColor4f( float r, float g, float b, float a );
 void _TriColor4ub( byte r, byte g, byte b, byte a );
-void _TriBrightness( float brightness );
-int _TriWorldToScreen( const float *world, float *screen );
-int _TriSpriteTexture( model_t *pSpriteModel, int frame );
+void TriColor4f( float r, float g, float b, float a );
+void TriColor4ub( byte r, byte g, byte b, byte a );
+void TriBrightness( float brightness );
+int TriWorldToScreen( const float *world, float *screen );
+int TriSpriteTexture( model_t *pSpriteModel, int frame );
 void TriFog( float flFogColor[3], float flStart, float flEnd, int bOn );
 void TriGetMatrix( const int pname, float *matrix );
 void TriFogParams( float flDensity, int iFogSkybox );
-void _TriCullFace( TRICULLSTYLE mode );
+void TriCullFace( TRICULLSTYLE mode );
 
 /*
 =======================================================================

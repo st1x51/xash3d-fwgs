@@ -138,7 +138,7 @@ qboolean Mod_ProcessRenderData( model_t *mod, qboolean create, const byte *buf )
 				// Mod_LoadStudioModel( mod, buf, loaded );
 				break;
 			case mod_sprite:
-				_Mod_LoadSpriteModel( mod, buf, &loaded, mod->numtexinfo );
+				Mod_LoadSpriteModel( mod, buf, &loaded, mod->numtexinfo );
 				break;
 			case mod_alias:
 				Mod_LoadAliasModel( mod, buf, &loaded );
@@ -429,20 +429,20 @@ ref_interface_t gReffuncs =
 	R_NewMap,
 	R_ClearScene,
 
-	_TriRenderMode,
+	TriRenderMode,
 	TriBegin,
 	TriEnd,
-	_TriColor4f_,
-	_TriColor4ub_,
+	_TriColor4f,
+	_TriColor4ub,
 	TriTexCoord2f,
 	TriVertex3fv,
 	TriVertex3f,
-	_TriWorldToScreen,
+	TriWorldToScreen,
 	TriFog,
 	R_ScreenToWorld,
 	TriGetMatrix,
 	TriFogParams,
-	_TriCullFace,
+	TriCullFace,
 
 	VGUI_DrawInit,
 	VGUI_DrawShutdown,

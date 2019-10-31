@@ -317,12 +317,12 @@ static void R_DrawSegs( vec3_t source, vec3_t delta, float width, float scale, f
 			VectorMA( curSeg.pos, (-curSeg.width * 0.5f ), vAveNormal, vPoint2 );
 
 			pglTexCoord2f( 0.0f, curSeg.texcoord );
-			_TriBrightness( brightness );
+			TriBrightness( brightness );
 			pglNormal3fv( vAveNormal );
 			pglVertex3fv( vPoint1 );
 
 			pglTexCoord2f( 1.0f, curSeg.texcoord );
-			_TriBrightness( brightness );
+			TriBrightness( brightness );
 			pglNormal3fv( vAveNormal );
 			pglVertex3fv( vPoint2 );
 		}
@@ -352,12 +352,12 @@ static void R_DrawSegs( vec3_t source, vec3_t delta, float width, float scale, f
 
 			// specify the points.
 			pglTexCoord2f( 0.0f, curSeg.texcoord );
-			_TriBrightness( brightness );
+			TriBrightness( brightness );
 			pglNormal3fv( vLastNormal );
 			pglVertex3fv( vPoint1 );
 
 			pglTexCoord2f( 1.0f, curSeg.texcoord );
-			_TriBrightness( brightness );
+			TriBrightness( brightness );
 			pglNormal3fv( vLastNormal );
 			pglVertex3fv( vPoint2 );
 		}
@@ -427,7 +427,7 @@ void R_DrawTorus( vec3_t source, vec3_t delta, float width, float scale, float f
 		}
 		
 		// Transform point into screen space
-		_TriWorldToScreen( point, screen );
+		TriWorldToScreen( point, screen );
 
 		if( i != 0 )
 		{
@@ -497,7 +497,7 @@ void R_DrawDisk( vec3_t source, vec3_t delta, float width, float scale, float fr
 		fraction = i * div;
 		VectorCopy( source, point );
 
-		_TriBrightness( 1.0f );
+		TriBrightness( 1.0f );
 		TriTexCoord2f( 1.0f, vLast );
 		TriVertex3fv( point );
 
@@ -506,7 +506,7 @@ void R_DrawDisk( vec3_t source, vec3_t delta, float width, float scale, float fr
 		point[1] = c * w + source[1];
 		point[2] = source[2];
 
-		_TriBrightness( 1.0f );
+		TriBrightness( 1.0f );
 		TriTexCoord2f( 0.0f, vLast );
 		TriVertex3fv( point );
 
@@ -555,7 +555,7 @@ void R_DrawCylinder( vec3_t source, vec3_t delta, float width, float scale, floa
 		point[1] = c * freq * delta[2] + source[1];
 		point[2] = source[2] + width;
 
-		_TriBrightness( 0 );
+		TriBrightness( 0 );
 		TriTexCoord2f( 1, vLast );
 		TriVertex3fv( point );
 
@@ -563,7 +563,7 @@ void R_DrawCylinder( vec3_t source, vec3_t delta, float width, float scale, floa
 		point[1] = c * freq * ( delta[2] + width ) + source[1];
 		point[2] = source[2] - width;
 
-		_TriBrightness( 1 );
+		TriBrightness( 1 );
 		TriTexCoord2f( 0, vLast );
 		TriVertex3fv( point );
 
@@ -626,14 +626,14 @@ void R_DrawBeamFollow( BEAM *pbeam, float frametime )
 	if( !pnew && div != 0 )
 	{
 		VectorCopy( pbeam->source, delta );
-		_TriWorldToScreen( pbeam->source, screenLast );
-		_TriWorldToScreen( particles->org, screen );
+		TriWorldToScreen( pbeam->source, screenLast );
+		TriWorldToScreen( particles->org, screen );
 	}
 	else if( particles && particles->next )
 	{
 		VectorCopy( particles->org, delta );
-		_TriWorldToScreen( particles->org, screenLast );
-		_TriWorldToScreen( particles->next->org, screen );
+		TriWorldToScreen( particles->org, screenLast );
+		TriWorldToScreen( particles->next->org, screen );
 		particles = particles->next;
 	}
 	else
@@ -666,15 +666,15 @@ void R_DrawBeamFollow( BEAM *pbeam, float frametime )
 
 	while( particles )
 	{
-		_TriBrightness( fraction );
+		TriBrightness( fraction );
 		TriTexCoord2f( 1, 1 );
 		TriVertex3fv( last2 );
-		_TriBrightness( fraction );
+		TriBrightness( fraction );
 		TriTexCoord2f( 0, 1 );
 		TriVertex3fv( last1 );
 
 		// Transform point into screen space
-		_TriWorldToScreen( particles->org, screen );
+		TriWorldToScreen( particles->org, screen );
 		// Build world-space normal to screen-space direction vector
 		VectorSubtract( screen, screenLast, tmp );
 
@@ -699,10 +699,10 @@ void R_DrawBeamFollow( BEAM *pbeam, float frametime )
 			fraction = 0.0;
 		}
 
-		_TriBrightness( fraction );
+		TriBrightness( fraction );
 		TriTexCoord2f( 0, 0 );
 		TriVertex3fv( last1 );
-		_TriBrightness( fraction );
+		TriBrightness( fraction );
 		TriTexCoord2f( 1, 0 );
 		TriVertex3fv( last2 );
 
@@ -805,7 +805,7 @@ void R_DrawRing( vec3_t source, vec3_t delta, float width, float amplitude, floa
 		VectorMA( point, factor, RI.vright, point );
 		
 		// Transform point into screen space
-		_TriWorldToScreen( point, screen );
+		TriWorldToScreen( point, screen );
 
 		if( i != 0 )
 		{
@@ -1057,9 +1057,9 @@ void R_BeamDraw( BEAM *pbeam, float frametime )
 		}
 	}
 
-	_TriRenderMode( FBitSet( pbeam->flags, FBEAM_SOLID ) ? kRenderNormal : kRenderTransAdd );
+	TriRenderMode( FBitSet( pbeam->flags, FBEAM_SOLID ) ? kRenderNormal : kRenderTransAdd );
 
-	if( !_TriSpriteTexture( model, (int)(pbeam->frame + pbeam->frameRate * gpGlobals->time) % pbeam->frameCount ))
+	if( !TriSpriteTexture( model, (int)(pbeam->frame + pbeam->frameRate * gpGlobals->time) % pbeam->frameCount ))
 	{
 		ClearBits( pbeam->flags, FBEAM_ISACTIVE );
 		return;
@@ -1076,10 +1076,10 @@ void R_BeamDraw( BEAM *pbeam, float frametime )
 	}
 
 	if( FBitSet( pbeam->flags, FBEAM_FADEIN ))
-		_TriColor4f( pbeam->r, pbeam->g, pbeam->b, pbeam->t * pbeam->brightness );
+		TriColor4f( pbeam->r, pbeam->g, pbeam->b, pbeam->t * pbeam->brightness );
 	else if( FBitSet( pbeam->flags, FBEAM_FADEOUT ))
-		_TriColor4f( pbeam->r, pbeam->g, pbeam->b, ( 1.0f - pbeam->t ) * pbeam->brightness );
-	else _TriColor4f( pbeam->r, pbeam->g, pbeam->b, pbeam->brightness );
+		TriColor4f( pbeam->r, pbeam->g, pbeam->b, ( 1.0f - pbeam->t ) * pbeam->brightness );
+	else TriColor4f( pbeam->r, pbeam->g, pbeam->b, pbeam->brightness );
 
 	switch( pbeam->type )
 	{

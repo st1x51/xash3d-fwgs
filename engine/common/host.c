@@ -323,7 +323,9 @@ void Host_MemStats_f( void )
 
 void Host_Minimize_f( void )
 {
+#ifdef XASH_SDL
 	if( host.hWnd ) SDL_MinimizeWindow( host.hWnd );
+#endif
 }
 
 /*
