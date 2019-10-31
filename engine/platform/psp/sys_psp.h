@@ -1,5 +1,5 @@
-#ifndef STUB_PSP_H
-#define STUB_PSP_H
+#ifndef SYS_PSP_H
+#define SYS_PSP_H
 
 #include "const.h"
 #include <fcntl.h> 

@@ -29,11 +29,13 @@ INCLUDES := \
 	engine/server
 
 CFILES := $(foreach dir,$(SOURCE_DIRS),$(addprefix $(dir)/,$(notdir $(wildcard $(dir)/*.c))))
-OBJS = $(CFILES:.c=.o)
+OBJS := $(CFILES:.c=.o)
 INCDIR = $(INCLUDES)
 CFLAGS = -DXASH_LOW_MEMORY=2 -DSINGLE_BINARY -DXASH_NO_ASYNC_NS_RESOLVE -DPATH_MAX=256 -D__PSP__ -finline-limit=10 \
 	-w -g -G0 -Werror=implicit-function-declaration -Werror=return-type -Werror=parentheses -fvisibility=hidden -Os
 LIBS = -lm -lgl -lpspvfpu -lpsprtc
+
+OBJS += ref_gl.o
 
 PSP_EBOOT = $(BUILD_DIR)/EBOOT.PBP
 PSP_EBOOT_SFO = $(BUILD_DIR)/PARAM.SFO

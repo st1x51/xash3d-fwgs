@@ -1,24 +1,18 @@
-#include "common.h"
-#include "library.h"
-#include "filesystem.h"
-#include "server.h"
 #include <pspkernel.h>
 #include <pspctrl.h>
 #include <pspsdk.h>
 #include <pspuser.h>
+#include "common.h"
+#include "library.h"
+#include "filesystem.h"
+#include "server.h"
+#include "lib_psp.h"
 
 PSP_MODULE_INFO("engine", PSP_MODULE_USER, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU);
 PSP_HEAP_SIZE_KB(-16 * 1024);
 
-typedef struct dll_s
-{
-	SceUID handle;
-	char name[MAX_DLNAMELEN];
-	int refcnt;
-	dllexport_t *exp;
-	struct dll_s *next;
-} dll_t;
+dllexport_t* get_ref_exports( void );
 
 static dll_t *dll_list;
 static char *dll_err = NULL;
@@ -48,10 +42,16 @@ void *dlopen( const char *name, int flag )
 	if( old ) { old->refcnt++; return old; }
 
 	char fullpath[MAX_SYSPATH];
-	Q_snprintf( fullpath, sizeof(fullpath), "%s", name );
+	Q_snprintf( fullpath, sizeof( fullpath ), "%s", name );
 
-	int status = 0;
+	dll_t *new = calloc( 1, sizeof( dll_t ) );
+	if( !new ) { dll_err = "dlopen(): out of memory";  return NULL; }
+	snprintf( new->name, MAX_DLNAMELEN, name );
 	SceUID h = pspSdkLoadStartModule( fullpath, PSP_MEMORY_PARTITION_USER );
+	new->handle = h;
+
+	if( strstr( new->name, "libref_gl.prx") )
+		new->exp = get_ref_exports();
 
 	if( !h ) { dll_err = "dlopen(): something went wrong"; return NULL; }
 	if( h < 0 )
@@ -62,17 +62,6 @@ void *dlopen( const char *name, int flag )
 	}
 	else
 		Con_Printf ( "dlopen(%s): success!\n", fullpath );
-
-	dll_t *new = calloc( 1, sizeof( dll_t ) );
-	if( !new ) { dll_err = "dlopen(): out of memory";  return NULL; }
-	snprintf( new->name, MAX_DLNAMELEN, name );
-	new->handle = h;
-
-	int i = 0;
-//	if(strstr(name, "ref_gl"))
-//	{
-//		printf("DLOPEN STATUS: %s\n", load_refgu_exports(&(new->exp)));
-//	}
 	
 	new->refcnt = 1;
 
@@ -114,8 +103,9 @@ int dlclose( void *handle )
 	if( d->refcnt <= 0 )
 	{
 		int status = 0;
-		int ret = 0;
-		//int ret = sceKernelStopModule( d->handle, 0, NULL, 0, NULL, &status );
+		sceKernelStopModule( d->handle, 0, NULL, &status, NULL );
+		int ret = sceKernelUnloadModule( d->handle );
+
 		if( ret != SCE_KERNEL_ERROR_OK )
 		{
 			snprintf( dll_err_buf, sizeof( dll_err_buf ), "dlclose(): error %d", ret );
@@ -143,6 +133,7 @@ int dlclose( void *handle )
 		}
 		free( d );
 	}
+	
 	return 0;
 }
 

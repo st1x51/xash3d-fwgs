@@ -35,7 +35,7 @@ GNU General Public License for more details.
 #endif
 
 #ifdef __PSP__
-#include "psp_stub.h"
+#include "sys_psp.h"
 #endif
 
 #define NET_USE_FRAGMENTS

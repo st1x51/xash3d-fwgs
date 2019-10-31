@@ -735,7 +735,7 @@ static void R_BuildLightMap( msurface_t *surf, byte *dest, int stride, qboolean 
 	if(r_blocklights)
 		free(r_blocklights);
 	
-	r_blocklights = (uint)malloc(sizeof( uint ) * size * 3 );
+	r_blocklights = (uint)calloc(size * 3, sizeof( uint ) );
 
 	// add all the lightmaps
 	for( map = 0; map < MAXLIGHTMAPS && surf->styles[map] != 255 && lm; map++ )

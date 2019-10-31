@@ -1,5 +1,5 @@
-#ifndef DLL_PSP_H
-#define DLL_PSP_H
+#ifndef LIB_PSP_H
+#define LIB_PSP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,6 +8,7 @@ extern "C" {
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <pspuser.h>
 
 #define MAX_DLNAMELEN 256
 
@@ -19,6 +20,15 @@ typedef struct dllexport_s
 	const char *name;
 	void *func;
 } dllexport_t;
+
+typedef struct dll_s
+{
+	SceUID handle;
+	char name[MAX_DLNAMELEN];
+	int refcnt;
+	dllexport_t *exp;
+	struct dll_s *next;
+} dll_t;
 
 typedef struct Dl_info_s
 {

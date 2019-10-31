@@ -26,7 +26,7 @@ GNU General Public License for more details.
 #include <unistd.h>
 #include <signal.h>
 #if defined(__PSP__)
-#include "platform/psp/psp_library.h"
+#include "lib_psp.h"
 #else
 #include <dlfcn.h>
 #endif

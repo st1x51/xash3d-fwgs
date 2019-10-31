@@ -1,18 +1,4 @@
-#include <pspkernel.h>
 #include <GL/gl.h>
-
-PSP_MODULE_INFO("ref_gl", PSP_MODULE_USER, 1, 0);
-PSP_NO_CREATE_MAIN_THREAD();
-
-int module_start( SceSize arglen, void *argp )
-{
-	return 0;
-}
-
-int module_stop( SceSize arglen, void *argp )
-{
-	return 0;
-}
 
 void glHint( GLenum target, GLenum mode )
 {
@@ -28,6 +14,7 @@ GLboolean glIsEnabled( GLenum cap )
 
 void glClipPlane( GLenum plane, const GLdouble *equation )
 {
+	
 }
 
 void glTexImage1D( GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels )

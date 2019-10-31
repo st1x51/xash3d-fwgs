@@ -21,7 +21,7 @@ GNU General Public License for more details.
 
 #if !defined(_WIN32)
 	#if defined(__PSP__)
-		#include "platform/psp/psp_library.h"
+		#include "lib_psp.h"
 	#else
 		#include <dlfcn.h>
 	#endif

@@ -2,6 +2,7 @@ TARGET = $(BUILD_DIR)/libref_gl
 
 SOURCE_DIRS := \
 	. \
+	psp \
 	../public
 
 INCLUDES := \

@@ -115,6 +115,7 @@ void *SW_LockBuffer()
 
 void SW_UnlockBuffer()
 {
+	
 }
 
 qboolean SW_CreateBuffer( int width, int height, uint *stride, uint *bpp, uint *r, uint *g, uint *b )
