@@ -35,6 +35,9 @@ CFLAGS = -DXASH_LOW_MEMORY=2 -DSINGLE_BINARY -DXASH_NO_ASYNC_NS_RESOLVE -DPATH_M
 	-w -g -G0 -Werror=implicit-function-declaration -Werror=return-type -Werror=parentheses -fvisibility=hidden -Os
 LIBS = -lm -lgl -lpspvfpu -lpsprtc
 
+PSP_EBOOT = $(BUILD_DIR)/EBOOT.PBP
+PSP_EBOOT_SFO = $(BUILD_DIR)/PARAM.SFO
+
 BUILD_PRX = 1
 PSP_FW_VERSION = 660
 EXTRA_TARGETS = $(BUILD_DIR)/EBOOT.PBP
