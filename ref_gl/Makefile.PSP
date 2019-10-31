@@ -14,7 +14,7 @@ INCLUDES := \
 	../pm_shared \
 	../engine/platform/psp
 
-CFILES := $(foreach dir,$(SOURCE_DIRS),$(addprefix $(dir)/,$(notdir $(wildcard $(dir)/*.c))))
+CFILES = $(foreach dir,$(SOURCE_DIRS),$(addprefix $(dir)/,$(notdir $(wildcard $(dir)/*.c))))
 OBJS = $(CFILES:.c=.o)
 INCDIR = $(INCLUDES)
 CFLAGS = -DXASH_GL_STATIC -DREF_DLL -D__PSP__ -w -g -G0 -Os
@@ -22,6 +22,7 @@ LDFLAGS = -mno-crt0 -nostartfiles
 LIBS = -lm -lgl -lpspvfpu -lpsprtc
 
 BUILD_PRX = 1
+PRX_EXPORTS = exports.exp
 PSP_FW_VERSION = 660
 PSP_LARGE_MEMORY = 1
 USE_NEWLIB_LIBC = 1

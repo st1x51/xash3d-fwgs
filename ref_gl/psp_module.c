@@ -2,6 +2,7 @@
 #include <GL/gl.h>
 
 PSP_MODULE_INFO("ref_gl", PSP_MODULE_USER, 1, 0);
+PSP_NO_CREATE_MAIN_THREAD();
 
 int module_start( SceSize arglen, void *argp )
 {

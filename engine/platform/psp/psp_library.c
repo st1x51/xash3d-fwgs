@@ -5,10 +5,11 @@
 #include <pspkernel.h>
 #include <pspctrl.h>
 #include <pspsdk.h>
+#include <pspuser.h>
 
 PSP_MODULE_INFO("engine", PSP_MODULE_USER, 1, 0);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_KB(-2 * 1024);
+PSP_HEAP_SIZE_KB(-16 * 1024);
 
 typedef struct dll_s
 {
@@ -180,6 +181,7 @@ qboolean COM_CheckLibraryDirectDependency( const char *name, const char *depname
 
 void *COM_LoadLibrary( const char *dllname, int build_ordinals_table, qboolean directpath )
 {
+	printf("Free Memory: %i bytes\n", sceKernelTotalFreeMemSize());
 	dll_user_t *hInst = NULL;
 	void *pHandle = NULL;
 
