@@ -395,8 +395,8 @@ static struct nsthread_s
 static void NET_InitializeCriticalSections( void )
 {
 	net.threads_initialized = true;
-	pInitializeCriticalSection( &nsthread.mutexns );
-	pInitializeCriticalSection( &nsthread.mutexres );
+	InitializeCriticalSection( &nsthread.mutexns );
+	InitializeCriticalSection( &nsthread.mutexres );
 }
 #endif
 
