@@ -12,8 +12,18 @@ def options(opt):
 
 	grp.add_option('--enable-stdin-input', action = 'store_true', dest = 'USE_SELECT', default = False,
 		help = 'enable console input from stdin (always enabled for dedicated) [default: %default]')
-	grp.add_option('--fbdev', action = 'store_true', dest = 'FBDEV_SW', default = False,
+
+	grp.add_option('--enable-fbdev', action = 'store_true', dest = 'FBDEV_SW', default = False,
 		help = 'build fbdev-only software-only engine')
+
+	grp.add_option('--disable-async-resolve', action = 'store_true', dest = 'NO_ASYNC_RESOLVE', default = False,
+		help = 'disable multithreaded operations(asynchronous name resolution)')
+
+	grp.add_option('--enable-custom-swap', action = 'store_true', dest = 'CUSTOM_SWAP', default = False,
+		help = 'enable custom swap allocator. For devices with no swap support')
+
+	grp.add_option('--enable-legacy-sdl', action = 'store_true', dest = 'SDL12', default = False,
+		help = 'enable using SDL1.2 instead of SDL2(not recommended) [default: %default')
 
 	opt.load('sdl2')
 
@@ -21,25 +31,38 @@ def configure(conf):
 	# check for dedicated server build
 	if conf.options.DEDICATED:
 		if conf.env.DEST_OS == 'linux':
-			conf.check_cc( lib='rt' )
+			conf.check_cc(lib='rt')
 		conf.define('XASH_DEDICATED', 1)
 	elif conf.env.DEST_OS == 'android': # Android doesn't need SDL2
 		for i in ['android', 'log', 'EGL']:
 			conf.check_cc(lib = i)
 	elif conf.options.FBDEV_SW:
-		conf.define('XASH_FBDEV', 1)
-		conf.env.FBDEV
+		# unused, XASH_LINUX without XASH_SDL gives fbdev & alsa support
+		# conf.define('XASH_FBDEV', 1)
+		conf.check_cc( lib = 'asound' )
+		conf.check_cc( lib = 'rt' )
+	elif conf.options.SDL12:
+		conf.define('XASH_SDL', 12)
+		conf.check_cfg(package='sdl', args='--cflags --libs', uselib_store='SDL2' )
+		if conf.env.DEST_OS == 'linux':
+			conf.check_cc( lib='rt' )
+		conf.env.HAVE_SDL2 = True
 	else:
 		conf.load('sdl2')
 		if not conf.env.HAVE_SDL2:
 			conf.fatal('SDL2 not availiable! If you want to build dedicated server, specify --dedicated')
-		conf.define('XASH_SDL', 1)
+		conf.define('XASH_SDL', 2)
 
 	if conf.options.USE_SELECT == None:
 		conf.options.USE_SELECT = conf.options.DEDICATED
 
-	conf.define_cond('SINGLE_BINARY', conf.env.SINGLE_BINARY)
+	if not conf.env.DEST_OS in ['win32', 'android'] and not conf.options.NO_ASYNC_RESOLVE:
+		conf.load('pthreads')
+		conf.check_pthread_flag()
 
+	conf.define_cond('XASH_CUSTOM_SWAP', conf.options.CUSTOM_SWAP)
+	conf.define_cond('SINGLE_BINARY', conf.env.SINGLE_BINARY)
+	conf.define_cond('XASH_NO_ASYNC_NS_RESOLVE', conf.options.NO_ASYNC_RESOLVE)
 	conf.define_cond('XASH_USE_SELECT', conf.options.USE_SELECT or conf.options.DEDICATED)
 	conf.define_cond('SUPPORT_BSP2_FORMAT', conf.options.SUPPORT_BSP2_FORMAT)
 	conf.define_cond('XASH_64BIT', conf.env.DEST_SIZEOF_VOID_P != 4)
@@ -47,6 +70,7 @@ def configure(conf):
 	conf.define_cond('PSAPI_VERSION', conf.env.DEST_OS == 'win32') # will be defined as 1
 
 def build(bld):
+	is_cxx_link = False
 	libs = [ 'public' ]
 	source = bld.path.ant_glob([
 		'common/*.c',
@@ -57,7 +81,7 @@ def build(bld):
 
 	# basic build: dedicated only, no dependencies
 	if bld.env.DEST_OS != 'win32':
-		libs += [ 'DL' , 'M', 'PTHREAD' ]
+		libs += [ 'DL' , 'M' , 'RT', 'PTHREAD', 'ASOUND']
 		source += bld.path.ant_glob(['platform/posix/*.c'])
 	else:
 		libs += ['USER32', 'SHELL32', 'GDI32', 'ADVAPI32', 'DBGHELP', 'PSAPI', 'WS2_32' ]
@@ -66,11 +90,17 @@ def build(bld):
 	if bld.env.DEST_OS == 'linux':
 		source += bld.path.ant_glob(['platform/linux/*.c'])
 
-	source += bld.path.ant_glob(['platform/stub/*.c'])
+	if bld.get_define('XASH_CUSTOM_SWAP'):
+		source += bld.path.ant_glob(['platform/swap/*.c'])
 
 	if bld.env.HAVE_SDL2:
 		libs.append('SDL2')
 		source += bld.path.ant_glob(['platform/sdl/*.c'])
+
+	if bld.env.MAGX:
+		libs.append('MAGX')
+		source += bld.path.ant_glob(['platform/magx/*.cpp'])
+		is_cxx_link = True
 
 	if bld.env.DEST_OS == 'android':
 		libs += ['LOG', 'EGL', 'ANDROID']
@@ -82,19 +112,16 @@ def build(bld):
 			'client/*.c',
 			'client/vgui/*.c',
 			'client/avi/*.c'])
-	else:
-		if bld.env.DEST_OS == 'linux':
-			libs.append('RT')
 
-	# HACK: public headers must be put before common, so we don't get wrong mathlib included
+	# HACK: public headers must be put before SDK common, so we don't get wrong mathlib included
 	includes = ['common', 'server', 'client', 'client/vgui', '.', '../public', '../common', '../pm_shared' ]
 
 	if bld.env.SINGLE_BINARY:
 		install_path = bld.env.BINDIR
-		features = 'c cprogram'
+		features = ['c', 'cxxprogram' if is_cxx_link else 'cprogram']
 	else:
 		install_path = bld.env.LIBDIR
-		features = 'c cshlib'
+		features = ['c', 'cxxshlib' if is_cxx_link else 'cshlib']
 
 	bld(source   = source,
 		target   = 'xash',

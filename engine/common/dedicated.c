@@ -12,7 +12,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */ 
-#ifdef XASH_DEDICATED
+#if XASH_DEDICATED
 #include "common.h"
 #include "mathlib.h"
 #include "ref_api.h"
@@ -267,11 +267,6 @@ qboolean UI_CreditsActive( void )
 	return false;
 }
 
-void GL_FreeImage( const char *name )
-{
-
-}
-
 void S_StopBackgroundTrack( void )
 {
 
@@ -330,6 +325,10 @@ void CL_ClearStaticEntities( void )
 void UI_ShowConnectionWarning( void )
 {
 
+}
+
+void CL_Crashed( void )
+{
 }
 
 #endif // XASH_DEDICATED

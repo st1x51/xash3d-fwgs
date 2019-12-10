@@ -10,7 +10,7 @@
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-#ifdef __ANDROID__
+#if XASH_ANDROID
 #include <linux/kd.h>
 #else
 #include <sys/kd.h>
@@ -39,7 +39,7 @@ void GL_SwapBuffers( void )
 {
 }
 
-void FB_GetScreenRes(int *x, int *y)
+void FB_GetScreenRes( int *x, int *y )
 {
 	*x = fb.vinfo.xres;
 	*y = fb.vinfo.yres;
@@ -121,16 +121,34 @@ qboolean VID_SetMode( void )
 
 rserr_t   R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 {
+	int render_w, render_h;
+	uint rotate = vid_rotate->value;
+
 	FB_GetScreenRes( &width, &height );
 
-	Con_Reportf( "R_ChangeDisplaySettings: forced resolution to %dx%d)\n", width, height);
+	render_w = width;
+	render_h = height;
 
-	R_SaveVideoMode( width, height );
+	Con_Reportf( "R_ChangeDisplaySettings: forced resolution to %dx%d)\n", width, height );
 
-	host.window_center_x = width / 2;
-	host.window_center_y = height / 2;
+	if( ref.dllFuncs.R_SetDisplayTransform( rotate, 0, 0, vid_scale->value, vid_scale->value ) )
+	{
+		if( rotate & 1 )
+		{
+			int swap = render_w;
 
-	refState.wideScreen = true; // V_AdjustFov will check for widescreen
+			render_w = render_h;
+			render_h = swap;
+		}
+
+		render_h /= vid_scale->value;
+		render_w /= vid_scale->value;
+	}
+	else
+	{
+		Con_Printf( S_WARN "failed to setup screen transform\n" );
+	}
+	R_SaveVideoMode( width, height, render_w, render_h );
 
 	return rserr_ok;
 }
@@ -204,6 +222,13 @@ void SW_UnlockBuffer( void )
 
 qboolean SW_CreateBuffer( int width, int height, uint *stride, uint *bpp, uint *r, uint *g, uint *b )
 {
+	if( width > fb.vinfo.xres_virtual || height > fb.vinfo.yres_virtual )
+	{
+		Con_Printf( S_ERROR "requested size %dx%d not fit to framebuffer size %dx%d\n",
+					width, height, fb.vinfo.xres_virtual, fb.vinfo.yres_virtual );
+		return false;
+	}
+
 	*bpp = fb.vinfo.bits_per_pixel >> 3;
 	*stride = fb.vinfo.xres_virtual;
 	*r = FB_BF_TO_MASK(fb.vinfo.red);
@@ -243,10 +268,6 @@ qboolean SW_CreateBuffer( int width, int height, uint *stride, uint *bpp, uint *
 }
 
 // unrelated stubs
-void Platform_MessageBox( const char *title, const char *message, qboolean parentMainWindow )
-{
-
-}
 void Platform_GetClipboardText( char *buffer, size_t size )
 {
 

@@ -65,14 +65,14 @@ typedef struct
 		dleaf_t		*leafs;
 		dleaf32_t		*leafs32;
 	};
-	int			numleafs;
+	size_t			numleafs;
 
 	union
 	{
 		dclipnode_t	*clipnodes;
 		dclipnode32_t	*clipnodes32;
 	};
-	int			numclipnodes;
+	size_t			numclipnodes;
 
 	dtexinfo_t		*texinfo;
 	size_t			numtexinfo;
@@ -162,7 +162,7 @@ typedef struct
 
 typedef struct
 {
-	const int		lumpnumber;
+	int		lumpnumber;
 	const size_t	mincount;
 	const size_t	maxcount;
 	const int		entrysize;
@@ -1085,7 +1085,7 @@ static void Mod_CalcSurfaceExtents( msurface_t *surf )
 			info->lightextents[i] = surf->extents[i];
 		}
 
-#if !defined XASH_DEDICATED && 0 // REFTODO:
+#if !XASH_DEDICATED && 0 // REFTODO:
 		if( !FBitSet( tex->flags, TEX_SPECIAL ) && ( surf->extents[i] > 16384 ) && ( tr.block_size == BLOCK_SIZE_DEFAULT ))
 			Con_Reportf( S_ERROR "Bad surface extents %i\n", surf->extents[i] );
 #endif // XASH_DEDICATED
@@ -1912,7 +1912,7 @@ static void Mod_LoadTextures( dbspmodel_t *bmod )
 
 	if( bmod->isworld )
 	{
-#ifndef XASH_DEDICATED
+#if !XASH_DEDICATED
 		// release old sky layers first
 		if( !Host_IsDedicated() )
 		{
@@ -1944,7 +1944,7 @@ static void Mod_LoadTextures( dbspmodel_t *bmod )
 			loadmodel->textures[i] = tx;
 
 			Q_strncpy( tx->name, "*default", sizeof( tx->name ));
-#ifndef XASH_DEDICATED
+#if !XASH_DEDICATED
 			if( !Host_IsDedicated() )
 			{
 				tx->gl_texturenum = R_GetBuiltinTexture( REF_DEFAULT_TEXTURE );
@@ -1977,7 +1977,7 @@ static void Mod_LoadTextures( dbspmodel_t *bmod )
 			int	size = (int)sizeof( mip_t ) + ((mt->width * mt->height * 85)>>6);
 			int	next_dataofs, remaining;
 
-			// compute next dataofset to determine allocated miptex sapce
+			// compute next dataofset to determine allocated miptex space
 			for( j = i + 1; j < loadmodel->numtextures; j++ )
 			{
 				next_dataofs = in->dataofs[j];
@@ -1993,7 +1993,7 @@ static void Mod_LoadTextures( dbspmodel_t *bmod )
 			if( remaining >= 770 ) custom_palette = true;
 		}
 
-#ifndef XASH_DEDICATED
+#if !XASH_DEDICATED
 		if( !Host_IsDedicated() )
 		{
 			// check for multi-layered sky texture (quake1 specific)
@@ -2370,7 +2370,7 @@ static void Mod_LoadSurfaces( dbspmodel_t *bmod )
 			next_lightofs = 99999999;
 		}
 
-#ifndef XASH_DEDICATED // TODO: Do we need subdivide on server?
+#if !XASH_DEDICATED // TODO: Do we need subdivide on server?
 		if( FBitSet( out->flags, SURF_DRAWTURB ) && !Host_IsDedicated() )
 			ref.dllFuncs.GL_SubdivideSurface( out ); // cut up polygon for warps
 #endif
@@ -2780,6 +2780,15 @@ qboolean Mod_LoadBmodelLumps( const byte *mod_base, qboolean isworld )
 	if( isworld ) world.flags = 0;	// clear world settings
 	bmod->isworld = isworld;
 
+	if( header->version == HLBSP_VERSION &&
+		header->lumps[LUMP_ENTITIES].fileofs <= 1024 &&
+		(header->lumps[LUMP_ENTITIES].filelen % sizeof( dplane_t )) == 0 )
+	{
+		// blue-shift swapped lumps
+		srclumps[0].lumpnumber = LUMP_PLANES;
+		srclumps[1].lumpnumber = LUMP_ENTITIES;
+	}
+
 	// loading base lumps
 	for( i = 0; i < ARRAYSIZE( srclumps ); i++ )
 		Mod_LoadLump( mod_base, &srclumps[i], &worldstats[i], isworld ? (LUMP_SAVESTATS|LUMP_SILENT) : 0 );
@@ -2820,7 +2829,7 @@ qboolean Mod_LoadBmodelLumps( const byte *mod_base, qboolean isworld )
 	if( isworld )
 	{
 		loadmodel = mod;		// restore pointer to world
-#ifndef XASH_DEDICATED
+#if !XASH_DEDICATED
 		Mod_InitDebugHulls();	// FIXME: build hulls for separate bmodels (shells, medkits etc)
 		world.deluxedata = bmod->deluxedata_out;	// deluxemap data pointer
 		world.shadowdata = bmod->shadowdata_out;	// occlusion data pointer
@@ -2882,6 +2891,15 @@ qboolean Mod_TestBmodelLumps( const char *name, const byte *mod_base, qboolean s
 			Con_Printf( S_ERROR "%s has wrong version number (%i should be %i)\n", name, header->version, HLBSP_VERSION );
 		loadstat.numerrors++;
 		break;
+	}
+
+	if( header->version == HLBSP_VERSION &&
+		header->lumps[LUMP_ENTITIES].fileofs <= 1024 &&
+		(header->lumps[LUMP_ENTITIES].filelen % sizeof( dplane_t )) == 0 )
+	{
+		// blue-shift swapped lumps
+		srclumps[0].lumpnumber = LUMP_PLANES;
+		srclumps[1].lumpnumber = LUMP_ENTITIES;
 	}
 
 	// loading base lumps

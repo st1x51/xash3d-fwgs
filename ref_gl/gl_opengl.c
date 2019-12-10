@@ -243,7 +243,19 @@ static dllfunc_t vbofuncs[] =
 	{ GL_CALL( glUnmapBufferARB ) }, // ,
 	{ GL_CALL( glBufferDataARB ) },
 	{ GL_CALL( glBufferSubDataARB ) },
-	{ NULL, NULL}
+	{ NULL, NULL }
+};
+
+static dllfunc_t drawrangeelementsfuncs[] =
+{
+{ GL_CALL( glDrawRangeElements ) },
+{ NULL, NULL }
+};
+
+static dllfunc_t drawrangeelementsextfuncs[] =
+{
+{ GL_CALL( glDrawRangeElementsEXT ) },
+{ NULL, NULL }
 };
 
 /*
@@ -581,6 +593,7 @@ void GL_InitExtensionsGLES( void )
 		// case GL_ARB_SEAMLESS_CUBEMAP: NOPE
 		// case GL_EXT_GPU_SHADER4: NOPE
 		// case GL_DEPTH_TEXTURE: NOPE
+		// case GL_DRAWRANGEELEMENTS_EXT: NOPE
 		default:
 			GL_SetExtension( extid, false );
 		}
@@ -653,7 +666,7 @@ void GL_InitExtensionsBigGL( void )
 	if( GL_CheckExtension( "GL_EXT_texture_filter_anisotropic", NULL, "gl_texture_anisotropic_filter", GL_ANISOTROPY_EXT ))
 		pglGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &glConfig.max_texture_anisotropy );
 
-#ifdef _WIN32 // Win32 only drivers?
+#if XASH_WIN32 // Win32 only drivers?
 	// g-cont. because lodbias it too glitchy on Intel's cards
 	if( glConfig.hardware_type != GLHW_INTEL )
 #endif
@@ -678,7 +691,7 @@ void GL_InitExtensionsBigGL( void )
 		pglGetIntegerv( GL_MAX_VERTEX_UNIFORM_COMPONENTS_ARB, &glConfig.max_vertex_uniforms );
 		pglGetIntegerv( GL_MAX_VERTEX_ATTRIBS_ARB, &glConfig.max_vertex_attribs );
 
-#ifdef _WIN32 // Win32 only drivers?
+#if XASH_WIN32 // Win32 only drivers?
 		if( glConfig.hardware_type == GLHW_RADEON && glConfig.max_vertex_uniforms > 512 )
 			glConfig.max_vertex_uniforms /= 4; // radeon returns not correct info
 #endif
@@ -691,6 +704,15 @@ void GL_InitExtensionsBigGL( void )
 
 	// rectangle textures support
 	GL_CheckExtension( "GL_ARB_texture_rectangle", NULL, "gl_texture_rectangle", GL_TEXTURE_2D_RECT_EXT );
+
+	if( !GL_CheckExtension( "glDrawRangeElements", drawrangeelementsfuncs, "gl_drawrangeelements", GL_DRAW_RANGEELEMENTS_EXT ) )
+	{
+		if( GL_CheckExtension( "glDrawRangeElementsEXT", drawrangeelementsextfuncs,
+			"gl_drawrangelements", GL_DRAW_RANGEELEMENTS_EXT ) )
+		{
+			pglDrawRangeElements = pglDrawRangeElementsEXT;
+		}
+	}
 
 	// this won't work without extended context
 	if( glw_state.extended )
@@ -747,7 +769,7 @@ void GL_InitExtensions( void )
 		gEngfuncs.Image_AddCmdFlags( IL_DDS_HARDWARE );
 
 	// MCD has buffering issues
-#ifdef _WIN32
+#if XASH_WIN32
 	if( Q_strstr( glConfig.renderer_string, "gdi" ))
 		gEngfuncs.Cvar_SetValue( "gl_finish", 1 );
 #endif
@@ -1041,7 +1063,7 @@ void GL_SetupAttributes( int safegl )
 	if( safegl < SAFE_NOACC )
 		gEngfuncs.GL_SetAttribute( REF_GL_ACCELERATED_VISUAL, 1 );
 
-	gEngfuncs.Con_Printf( "bpp %d\n", glw_state.desktopBitsPixel );
+	gEngfuncs.Con_Printf( "bpp %d\n", gpGlobals->desktopBitsPixel );
 
 	if( safegl < SAFE_NOSTENCIL )
 		gEngfuncs.GL_SetAttribute( REF_GL_STENCIL_SIZE, gl_stencilbits->value );
@@ -1056,13 +1078,13 @@ void GL_SetupAttributes( int safegl )
 
 	if( safegl < SAFE_NOCOLOR )
 	{
-		if( glw_state.desktopBitsPixel >= 24 )
+		if( gpGlobals->desktopBitsPixel >= 24 )
 		{
 			gEngfuncs.GL_SetAttribute( REF_GL_RED_SIZE, 8 );
 			gEngfuncs.GL_SetAttribute( REF_GL_GREEN_SIZE, 8 );
 			gEngfuncs.GL_SetAttribute( REF_GL_BLUE_SIZE, 8 );
 		}
-		else if( glw_state.desktopBitsPixel >= 16 )
+		else if( gpGlobals->desktopBitsPixel >= 16 )
 		{
 			gEngfuncs.GL_SetAttribute( REF_GL_RED_SIZE, 5 );
 			gEngfuncs.GL_SetAttribute( REF_GL_GREEN_SIZE, 6 );

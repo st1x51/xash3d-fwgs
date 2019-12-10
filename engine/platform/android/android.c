@@ -210,7 +210,7 @@ nativeSetPause
 */
 #define VA_ARGS(...) , ##__VA_ARGS__ // GCC extension
 #define DECLARE_JNI_INTERFACE( ret, name, ... ) \
-	JNIEXPORT ret JNICALL Java_in_celest_xash3d_XashActivity_##name( JNIEnv *env, jclass clazz VA_ARGS(__VA_ARGS__) )
+	JNIEXPORT ret JNICALL Java_su_xash_engine_XashActivity_##name( JNIEnv *env, jclass clazz VA_ARGS(__VA_ARGS__) )
 
 DECLARE_JNI_INTERFACE( int, nativeInit, jobject array )
 {
@@ -246,7 +246,7 @@ DECLARE_JNI_INTERFACE( int, nativeInit, jobject array )
 	/* Init callbacks. */
 
 	jni.env = env;
-	jni.actcls = (*env)->FindClass(env, "in/celest/xash3d/XashActivity");
+	jni.actcls = (*env)->FindClass(env, "su/xash/engine/XashActivity");
 	jni.enableTextInput = (*env)->GetStaticMethodID(env, jni.actcls, "showKeyboard", "(I)V");
 	jni.vibrate = (*env)->GetStaticMethodID(env, jni.actcls, "vibrate", "(I)V" );
 	jni.messageBox = (*env)->GetStaticMethodID(env, jni.actcls, "messageBox", "(Ljava/lang/String;Ljava/lang/String;)V");
@@ -258,6 +258,13 @@ DECLARE_JNI_INTERFACE( int, nativeInit, jobject array )
 	jni.loadID = (*env)->GetStaticMethodID(env, jni.actcls, "loadID", "()Ljava/lang/String;");
 	jni.showMouse = (*env)->GetStaticMethodID(env, jni.actcls, "showMouse", "(I)V");
 	jni.shellExecute = (*env)->GetStaticMethodID(env, jni.actcls, "shellExecute", "(Ljava/lang/String;)V");
+
+	jni.swapBuffers = (*env)->GetStaticMethodID(env, jni.actcls, "swapBuffers", "()V");
+	jni.toggleEGL = (*env)->GetStaticMethodID(env, jni.actcls, "toggleEGL", "(I)V");
+	jni.createGLContext = (*env)->GetStaticMethodID(env, jni.actcls, "createGLContext", "([I[I)Z");
+	jni.getGLAttribute = (*env)->GetStaticMethodID(env, jni.actcls, "getGLAttribute", "(I)I");
+	jni.deleteGLContext = (*env)->GetStaticMethodID(env, jni.actcls, "deleteGLContext", "()Z");
+	jni.getSelectedPixelFormat = (*env)->GetStaticMethodID(env, jni.actcls, "getSelectedPixelFormat", "()I");
 
 	/* Run the application. */
 
@@ -645,10 +652,12 @@ Android_MessageBox
 Show messagebox and wait for OK button press
 ========================
 */
+#if XASH_MESSAGEBOX == MSGBOX_ANDROID
 void Platform_MessageBox( const char *title, const char *text, qboolean parentMainWindow )
 {
 	(*jni.env)->CallStaticVoidMethod( jni.env, jni.actcls, jni.messageBox, (*jni.env)->NewStringUTF( jni.env, title ), (*jni.env)->NewStringUTF( jni.env ,text ) );
 }
+#endif // XASH_MESSAGEBOX == MSGBOX_ANDROID
 
 /*
 ========================
@@ -842,8 +851,8 @@ void Platform_RunEvents( void )
 			{
 				host.status = HOST_FRAME;
 				SNDDMA_Activate( true );
-				// (*jni.env)->CallStaticVoidMethod( jni.env, jni.actcls, jni.toggleEGL, 1 );
-				// Android_UpdateSurface();
+				(*jni.env)->CallStaticVoidMethod( jni.env, jni.actcls, jni.toggleEGL, 1 );
+				Android_UpdateSurface();
 				SetBits( gl_vsync->flags, FCVAR_CHANGED ); // set swap interval
 				host.force_draw_version = true;
 				host.force_draw_version_time = host.realtime + FORCE_DRAW_VERSION_TIME;
@@ -853,18 +862,18 @@ void Platform_RunEvents( void )
 			{
 				host.status = HOST_NOFOCUS;
 				SNDDMA_Activate( false );
-				// (*jni.env)->CallStaticVoidMethod( jni.env, jni.actcls, jni.toggleEGL, 0 );
-				// negl.valid = false;
+				(*jni.env)->CallStaticVoidMethod( jni.env, jni.actcls, jni.toggleEGL, 0 );
+				negl.valid = false;
 			}
 			break;
 
 		case event_resize:
 			// reinitialize EGL and change engine screen size
-			if( host.status == HOST_NORMAL && ( refState.width != jni.width || refState.height != jni.height ) )
+			if( host.status == HOST_FRAME &&( refState.width != jni.width || refState.height != jni.height ) )
 			{
-				// (*jni.env)->CallStaticVoidMethod( jni.env, jni.actcls, jni.toggleEGL, 0 );
-				// (*jni.env)->CallStaticVoidMethod( jni.env, jni.actcls, jni.toggleEGL, 1 );
-				// Android_UpdateSurface();
+				(*jni.env)->CallStaticVoidMethod( jni.env, jni.actcls, jni.toggleEGL, 0 );
+				(*jni.env)->CallStaticVoidMethod( jni.env, jni.actcls, jni.toggleEGL, 1 );
+				Android_UpdateSurface();
 				SetBits( gl_vsync->flags, FCVAR_CHANGED ); // set swap interval
 				VID_SetMode();
 			}

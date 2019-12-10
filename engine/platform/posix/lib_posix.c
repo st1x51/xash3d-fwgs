@@ -13,7 +13,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef _WIN32 // see win_lib.c
+#include "build.h"
+#if !XASH_WIN32 // see win_lib.c
 #define _GNU_SOURCE
 
 #include "common.h"
@@ -72,12 +73,8 @@ void *COM_LoadLibrary( const char *dllname, int build_ordinals_table, qboolean d
 	COM_ResetLibraryError();
 
 	// platforms where gameinfo mechanism is impossible
-#if TARGET_OS_IPHONE
-	return IOS_LoadLibrary( dllname );
-#elif defined( __EMSCRIPTEN__ )
-	return EMSCRIPTEN_LoadLibrary( dllname );
-#elif defined( __ANDROID__ )
-	return ANDROID_LoadLibrary( dllname );
+#ifdef Platform_POSIX_LoadLibrary
+	return Platform_POSIX_LoadLibrary( dllname );
 #endif
 
 	// platforms where gameinfo mechanism is working goes here
@@ -156,9 +153,13 @@ void COM_FreeLibrary( void *hInstance )
 		return Loader_FreeLibrary( hInstance );
 	else
 #endif
-#if !defined __EMSCRIPTEN__ || defined EMSCRIPTEN_LIB_FS
-	dlclose( hInstance );
+	{
+#ifdef Platform_POSIX_FreeLibrary
+		Platform_POSIX_FreeLibrary( hInstance );
+#else
+		dlclose( hInstance );
 #endif
+	}
 }
 
 void *COM_GetProcAddress( void *hInstance, const char *name )
@@ -169,8 +170,8 @@ void *COM_GetProcAddress( void *hInstance, const char *name )
 		return Loader_GetProcAddress(hInstance, name);
 	else
 #endif
-#if defined(__ANDROID__)
-	return ANDROID_GetProcAddress( hInstance, name );
+#if Platform_POSIX_GetProcAddress
+	return Platform_POSIX_GetProcAddress( hInstance, name );
 #else
 	return dlsym( hInstance, name );
 #endif

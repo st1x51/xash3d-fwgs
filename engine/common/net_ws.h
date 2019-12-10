@@ -29,8 +29,12 @@ typedef enum
 // Max length of a multicast message
 #define MAX_MULTICAST		8192	// some mods spamming for rain effect
 
-#define MAX_INIT_MSG		0x20000	// max length of possible message
 
+#if !XASH_LOW_MEMORY
+#define MAX_INIT_MSG		0x20000	// max length of possible message
+#else
+#define MAX_INIT_MSG 0x8000
+#endif
 // net packets type
 #define NET_HEADER_OUTOFBANDPACKET	-1
 #define NET_HEADER_SPLITPACKET	-2
@@ -64,7 +68,7 @@ void NET_SendPacket( netsrc_t sock, size_t length, const void *data, netadr_t to
 void NET_SendPacketEx( netsrc_t sock, size_t length, const void *data, netadr_t to, size_t splitsize );
 void NET_ClearLagData( qboolean bClient, qboolean bServer );
 
-#ifndef XASH_DEDICATED
+#if !XASH_DEDICATED
 qboolean CL_LegacyMode( void );
 int CL_GetSplitSize( void );
 #endif

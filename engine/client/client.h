@@ -16,6 +16,7 @@ GNU General Public License for more details.
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include "xash3d_types.h"
 #include "mathlib.h"
 #include "cdll_int.h"
 #include "menu_int.h"
@@ -37,8 +38,6 @@ GNU General Public License for more details.
 #define SPR_CLIENT		0	// client sprite for temp-entities or user-textures
 #define SPR_HUDSPRITE	1	// hud sprite
 #define SPR_MAPSPRITE	2	// contain overview.bmp that diced into frames 128x128
-
-typedef int		sound_t;
 
 //=============================================================================
 typedef struct netbandwithgraph_s
@@ -96,7 +95,11 @@ typedef struct
 #define ANGLE_MASK		(ANGLE_BACKUP - 1)
 
 #define CL_UPDATE_MASK	(CL_UPDATE_BACKUP - 1)
+#if XASH_LOW_MEMORY == 2
+#define CL_UPDATE_BACKUP SINGLEPLAYER_BACKUP
+#else
 extern int CL_UPDATE_BACKUP;
+#endif
 
 #define SIGNONS		2		// signon messages to receive before connected
 #define INVALID_HANDLE	0xFFFF		// for XashXT cache system
@@ -1114,6 +1117,27 @@ qboolean SCR_NextMovie( void );
 void SCR_RunCinematic( void );
 void SCR_StopCinematic( void );
 void CL_PlayVideo_f( void );
+
+
+//
+// keys.c
+//
+int Key_IsDown( int keynum );
+const char *Key_IsBind( int keynum );
+void Key_Event( int key, int down );
+void Key_Init( void );
+void Key_WriteBindings( file_t *f );
+const char *Key_GetBinding( int keynum );
+void Key_SetBinding( int keynum, const char *binding );
+void Key_ClearStates( void );
+const char *Key_KeynumToString( int keynum );
+int Key_StringToKeynum( const char *str );
+int Key_GetKey( const char *binding );
+void Key_EnumCmds_f( void );
+void Key_SetKeyDest( int key_dest );
+void Key_EnableTextInput( qboolean enable, qboolean force );
+int Key_ToUpper( int key );
+void OSK_Draw( void );
 
 extern rgba_t g_color_table[8];
 

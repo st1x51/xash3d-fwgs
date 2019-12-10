@@ -589,7 +589,7 @@ void SV_RestartAmbientSounds( void )
 		SV_StartSound( pfnPEntityOfEntIndex( si->entnum ), CHAN_STATIC, si->name, si->volume, si->attenuation, 0, si->pitch );
 	}
 
-#ifndef XASH_DEDICATED // TODO: ???
+#if !XASH_DEDICATED // TODO: ???
 	// restart soundtrack
 	if( S_StreamGetCurrentState( curtrack, looptrack, &position ))
 	{
@@ -618,7 +618,7 @@ void SV_RestartDecals( void )
 	// g-cont. add space for studiodecals if present
 	host.decalList = (decallist_t *)Z_Calloc( sizeof( decallist_t ) * MAX_RENDER_DECALS * 2 );
 
-#ifndef XASH_DEDICATED
+#if !XASH_DEDICATED
 	if( !Host_IsDedicated() )
 	{
 		host.numdecals = ref.dllFuncs.R_CreateDecalList( host.decalList );
@@ -2042,10 +2042,10 @@ int SV_BuildSoundMsg( sizebuf_t *msg, edict_t *ent, int chan, const char *sample
 	{
 		sound_idx = Q_atoi( sample + 1 );
 
-		if( sound_idx >= MAX_SOUNDS )
+		if( sound_idx >= MAX_SOUNDS_NONSENTENCE )
 		{
 			SetBits( flags, SND_SENTENCE|SND_SEQUENCE );
-			sound_idx -= MAX_SOUNDS;
+			sound_idx -= MAX_SOUNDS_NONSENTENCE;
 		}
 		else SetBits( flags, SND_SENTENCE );
 	}
@@ -3049,7 +3049,7 @@ void SV_SetStringArrayMode( qboolean dynamic )
 }
 
 #ifdef XASH_64BIT
-#ifndef _WIN32
+#if !XASH_WIN32
 #define USE_MMAP
 #include <sys/mman.h>
 #endif
