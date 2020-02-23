@@ -28,6 +28,8 @@ ANDROID_NDK_SYSROOT_FLAG_MAX = 19 # latest NDK that need --sysroot flag
 ANDROID_NDK_API_MIN = { 10: 3, 19: 16, 20: 16 } # minimal API level ndk revision supports
 ANDROID_64BIT_API_MIN = 21 # minimal API level that supports 64-bit targets
 
+PSP_SDK_ENVVARS = ['PSPSDK']
+
 # This class does support ONLY r10e and r19c/r20 NDK
 class Android:
 	ctx            = None # waf context
@@ -320,10 +322,49 @@ class Android:
 				ldflags += ['-march=armv5te']
 		return ldflags
 
+class PSP:
+	ctx = None
+
+	def __init__(self, ctx):
+		self.ctx = ctx
+
+		for i in PSP_SDK_ENVVARS:
+			self.sdk_home = os.getenv(i)
+			if self.sdk_home != None:
+				break
+		else:
+			ctx.fatal('Set %s environment variable pointing to the root of PSP SDK!' %
+				' or '.join(PSP_SDK_ENVVARS))
+
+	def get_executable_path(self, exe):
+		return os.path.join(self.sdk_home, 'bin', '%s%s' % (exe, '.exe' if sys.platform == 'win32' else ''))
+	
+	def cflags(self):
+		cflags = ['-D_PSP_FW_VERSION=660', '-I.']
+		cflags += ['-I%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'include')]
+		# cflags += ['-g', '-gdwarf-2', '-gstrict-dwarf']
+		cflags += ['-I%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'include', 'libc')]
+		return cflags
+
+	def linkflags(self):
+		linkflags = ['-g', '-gdwarf-2', '-gstrict-dwarf']
+		return linkflags
+	
+	def ldflags(self):
+		ldflags = ['-L%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'lib')]
+		ldflags += ['-lpsplibc']
+		ldflags += ['-lpspdebug', '-lpspdisplay', '-lpspge', '-lpspctrl', '-lpspsdk']
+		ldflags += ['-lpspnet', '-lpspnet_inet', '-lpspnet_apctl', '-lpspnet_resolver', '-lpsputility', '-lpspuser']
+		return ldflags
+
 def options(opt):
 	android = opt.add_option_group('Android options')
 	android.add_option('--android', action='store', dest='ANDROID_OPTS', default=None,
 		help='enable building for android, format: --android=<arch>,<toolchain>,<api>, example: --android=armeabi-v7a-hard,4.9,9')
+	
+	psp = opt.add_option_group('PSP options')
+	psp.add_option('--psp', action='store_true', dest='PSP', default=False,
+		help='enable building for psp')
 
 def configure(conf):
 	if conf.options.ANDROID_OPTS:
@@ -360,10 +401,34 @@ def configure(conf):
 
 		# conf.env.ANDROID_OPTS = android
 		conf.env.DEST_OS2 = 'android'
+	
+	if conf.options.PSP:
+		conf.psp = psp = PSP(conf)
+		conf.environ['CC'] = psp.get_executable_path('psp-gcc')
+		conf.environ['CXX'] = psp.get_executable_path('psp-g++')
+		conf.environ['GDC'] = psp.get_executable_path('psp-gdc')
+		conf.environ['AS'] = psp.get_executable_path('psp-gcc')
+		conf.environ['LD'] = psp.get_executable_path('psp-gcc')
+		conf.environ['AR'] = psp.get_executable_path('psp-ar')
+		conf.environ['RANLIB'] = psp.get_executable_path('psp-ranlib')
+		conf.environ['STRIP'] = psp.get_executable_path('psp-strip')
+		conf.environ['OBJCOPY'] = psp.get_executable_path('psp-objcopy')
 
-	MACRO_TO_DESTOS = OrderedDict({ '__ANDROID__' : 'android' })
+		conf.env.CFLAGS += psp.cflags()
+		conf.env.CXXFLAGS += psp.cflags()
+		# conf.env.LINKFLAGS += psp.linkflags()
+		conf.env.LDFLAGS += psp.ldflags()
+
+		conf.env.DEST_OS2 = 'psp'
+
+	MACRO_TO_DESTOS = OrderedDict({
+		'__ANDROID__' : 'android',
+		'__psp__' : 'psp'
+	})
+
 	for k in c_config.MACRO_TO_DESTOS:
 		MACRO_TO_DESTOS[k] = c_config.MACRO_TO_DESTOS[k] # ordering is important
+
 	c_config.MACRO_TO_DESTOS  = MACRO_TO_DESTOS
 
 def post_compiler_cxx_configure(conf):

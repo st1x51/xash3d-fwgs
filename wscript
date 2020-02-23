@@ -137,9 +137,9 @@ def configure(conf):
 	# TODO: wrapper around bld.stlib, bld.shlib and so on?
 	conf.env.MSVC_SUBSYSTEM = 'WINDOWS,5.01'
 	conf.env.MSVC_TARGETS = ['x86'] # explicitly request x86 target for MSVC
-	if sys.platform == 'win32':
+	conf.load('subproject xcompile xshlib compiler_c compiler_cxx gitversion clang_compilation_database strip_on_install waf_unit_test')
+	if conf.env.COMPILER_CC == 'msvc':
 		conf.load('msvc msvc_pdb msdev msvs')
-	conf.load('xshlib subproject xcompile compiler_c compiler_cxx gitversion clang_compilation_database strip_on_install waf_unit_test')
 
 	try:
 		conf.env.CC_VERSION[0]

@@ -67,6 +67,7 @@ For more information, please refer to <http://unlicense.org/>
 #undef XASH_MSVC
 #undef XASH_NETBSD
 #undef XASH_OPENBSD
+#undef XASH_PSP
 #undef XASH_WIN32
 #undef XASH_WIN64
 #undef XASH_X86
@@ -115,6 +116,8 @@ For more information, please refer to <http://unlicense.org/>
 #elif defined __WATCOMC__ && defined __DOS__
 	#define XASH_DOS4GW 1
 	#define XASH_LITTLE_ENDIAN
+#elif defined __psp__
+	#define XASH_PSP 1
 #else
 #error "Place your operating system name here! If this is a mistake, try to fix conditions above and report a bug"
 #endif

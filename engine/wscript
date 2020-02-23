@@ -55,6 +55,8 @@ def configure(conf):
 		if conf.env.DEST_OS == 'linux':
 			conf.check_cc( lib='rt' )
 		conf.env.HAVE_SDL2 = True
+	elif conf.env.DEST_OS == 'psp':
+		pass
 	else:
 		conf.load('sdl2')
 		if not conf.env.HAVE_SDL2:
@@ -132,6 +134,10 @@ def build(bld):
 	if bld.env.DEST_OS == 'android':
 		libs += ['LOG', 'EGL', 'ANDROID']
 		source += bld.path.ant_glob(['platform/android/*.cpp', 'platform/android/*.c', 'platform/linux/*.c'])
+	
+	if bld.env.DEST_OS == 'psp':
+		# libs += ['LOG', 'EGL', 'ANDROID']
+		source += bld.path.ant_glob(['platform/psp/*.c'])
 
 	# add client files
 	if not bld.env.DEDICATED:
