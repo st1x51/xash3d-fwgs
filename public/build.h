@@ -115,9 +115,10 @@ For more information, please refer to <http://unlicense.org/>
 	#define XASH_EMSCRIPTEN 1
 #elif defined __WATCOMC__ && defined __DOS__
 	#define XASH_DOS4GW 1
-	#define XASH_LITTLE_ENDIAN
+	#define XASH_LITTLE_ENDIAN 1
 #elif defined __psp__
 	#define XASH_PSP 1
+	#define XASH_LITTLE_ENDIAN 1
 #else
 #error "Place your operating system name here! If this is a mistake, try to fix conditions above and report a bug"
 #endif

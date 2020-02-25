@@ -340,7 +340,7 @@ int NET_GetHostByName( const char *hostname )
 #endif
 }
 
-#if !defined XASH_NO_ASYNC_NS_RESOLVE && ( XASH_WIN32 || !(XASH_EMSCRIPTEN || XASH_DOS4GW) )
+#if !defined XASH_NO_ASYNC_NS_RESOLVE && ( XASH_WIN32 || !(XASH_EMSCRIPTEN || XASH_DOS4GW || XASH_PSP) )
 #define CAN_ASYNC_NS_RESOLVE
 #endif
 

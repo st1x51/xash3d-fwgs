@@ -13,10 +13,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-
 #define INVALID_SOCKET (-1)
 #define SOCKET_ERROR (-1)
 #define SOCKET int
+extern int errno;
 typedef int WSAsize_t;
 struct in_addr {unsigned long s_addr;};
 struct sockaddr_in{ short sin_family;unsigned short sin_port;struct in_addr sin_addr;};

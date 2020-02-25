@@ -340,10 +340,10 @@ class PSP:
 		return os.path.join(self.sdk_home, 'bin', '%s%s' % (exe, '.exe' if sys.platform == 'win32' else ''))
 	
 	def cflags(self):
-		cflags = ['-D_PSP_FW_VERSION=660', '-I.']
+		cflags = ['-G0', '-D_PSP_FW_VERSION=660', '-I.']
+		# cflags += ['-I%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'include', 'libc')]
 		cflags += ['-I%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'include')]
 		# cflags += ['-g', '-gdwarf-2', '-gstrict-dwarf']
-		cflags += ['-I%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'include', 'libc')]
 		return cflags
 
 	def linkflags(self):
@@ -351,10 +351,11 @@ class PSP:
 		return linkflags
 	
 	def ldflags(self):
-		ldflags = ['-L%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'lib')]
-		ldflags += ['-lpsplibc']
-		ldflags += ['-lpspdebug', '-lpspdisplay', '-lpspge', '-lpspctrl', '-lpspsdk']
-		ldflags += ['-lpspnet', '-lpspnet_inet', '-lpspnet_apctl', '-lpspnet_resolver', '-lpsputility', '-lpspuser']
+		ldflags = ['-specs=%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'lib', 'prxspecs')]
+		ldflags += ['-Wl,-q,-T%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'lib', 'linkfile.prx')]
+		ldflags += ['-L.', '-L%s' % os.path.join(self.sdk_home, 'psp', 'sdk', 'lib')]
+		ldflags += ['-lc', '-lstdc++', '-lm', '-lpspdebug', '-lpspgu', '-lpspdisplay', '-lpspge', '-lpspctrl', '-lpspsdk'] # ldflags += ['-lpsplibc']
+		ldflags += ['-lc', '-lpspnet', '-lpspnet_inet', '-lpspnet_apctl', '-lpspnet_resolver', '-lpsputility', '-lpspuser', '-lpspkernel']
 		return ldflags
 
 def options(opt):
@@ -405,7 +406,7 @@ def configure(conf):
 	if conf.options.PSP:
 		conf.psp = psp = PSP(conf)
 		conf.environ['CC'] = psp.get_executable_path('psp-gcc')
-		conf.environ['CXX'] = psp.get_executable_path('psp-g++')
+		conf.environ['CXX'] = psp.get_executable_path('psp-gcc')
 		conf.environ['GDC'] = psp.get_executable_path('psp-gdc')
 		conf.environ['AS'] = psp.get_executable_path('psp-gcc')
 		conf.environ['LD'] = psp.get_executable_path('psp-gcc')
@@ -419,7 +420,7 @@ def configure(conf):
 		# conf.env.LINKFLAGS += psp.linkflags()
 		conf.env.LDFLAGS += psp.ldflags()
 
-		conf.env.DEST_OS2 = 'psp'
+		# conf.env.DEST_OS2 = 'psp'
 
 	MACRO_TO_DESTOS = OrderedDict({
 		'__ANDROID__' : 'android',

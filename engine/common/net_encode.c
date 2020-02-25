@@ -972,7 +972,7 @@ qboolean Delta_CompareField( delta_t *pField, void *from, void *to, float timeba
 	}
 	else if( pField->flags & DT_INTEGER )
 	{
-#if defined __GNUC__ && __GNUC_MAJOR < 9 && !defined __clang__
+#if defined __GNUC__ && defined __GNUC_MAJOR && __GNUC_MAJOR < 9 && !defined __clang__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wduplicated-branches"
 #endif
@@ -986,7 +986,7 @@ qboolean Delta_CompareField( delta_t *pField, void *from, void *to, float timeba
 			fromF = *(uint *)((byte *)from + pField->offset );
 			toF = *(uint *)((byte *)to + pField->offset );
 		}
-#if defined __GNUC__ && __GNUC_MAJOR < 9 && !defined __clang__
+#if defined __GNUC__ && defined __GNUC_MAJOR && __GNUC_MAJOR < 9 && !defined __clang__
 #pragma GCC diagnostic pop
 #endif
 

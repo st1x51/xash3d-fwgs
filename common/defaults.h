@@ -88,11 +88,26 @@ SETUP BACKENDS DEFINITIONS
 		#ifndef XASH_VIDEO
 			#define XASH_VIDEO VIDEO_DOS
 		#endif
+
 		#ifndef XASH_TIMER
 			#define XASH_TIMER TIMER_DOS
 		#endif
 
 		// usually only 10-20 fds availiable
+		#define XASH_REDUCE_FD
+	#elif XASH_PSP
+		#ifndef XASH_VIDEO
+			#define XASH_VIDEO VIDEO_PSP
+		#endif
+		
+		#ifndef XASH_TIMER
+			#define XASH_TIMER TIMER_PSP
+		#endif
+
+		#ifndef XASH_INPUT
+			#define XASH_INPUT INPUT_PSP
+		#endif
+
 		#define XASH_REDUCE_FD
 	#endif
 
