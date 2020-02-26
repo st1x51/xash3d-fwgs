@@ -68,21 +68,16 @@ GNU General Public License for more details.
 #endif
 
 #if XASH_PSP
-	#include <pspiofilemgr.h>
+	#include <unistd.h>
 	#define PATH_MAX 1024
 	#define PATH_SPLITTER "/"
 	#define O_BINARY 0
 	#define O_TEXT 0
-	#define read( x, y, z )				sceIoRead( x, y, z )
-	#define write( x, y, z )			sceIoWrite( x, y, z )
-	#define lseek( x, y, z )			sceIoLseek( x, y, z )
-	#define tell( x ) 					sceIoLseek( x, 0, 1 )
-	#define close( x ) 					sceIoClose( x )
-	#define _mkdir( x )					sceIoMkdir( x, 0777 )
+	#define _mkdir( x )					mkdir( x, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH )
 	#define SetCurrentDirectory( x ) 	( !chdir( x ) )
-	#define LoadLibrary( x ) 			(0)
-	#define GetProcAddress( x, y ) 		(0)
-	#define FreeLibrary( x ) 			(0)
+	#define LoadLibrary( x ) 			( 0 )
+	#define GetProcAddress( x, y ) 		( 0 )
+	#define FreeLibrary( x ) 			( 0 )
 #endif
 
 #if XASH_DOS4GW

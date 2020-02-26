@@ -5,6 +5,7 @@
 #if XASH_VIDEO == VIDEO_PSP
 #include <pspdisplay.h>
 #include <pspgu.h>
+#include <pspkernel.h>
 
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 272
@@ -14,11 +15,11 @@ static qboolean vsync;
 void *fbp0;
 void *fbp1;
 static unsigned int static_offset = 0;
-unsigned int __attribute__((aligned(16))) list[262144];
+unsigned int __attribute__((aligned(16))) list[ 256 * 1024 ];
 
 static unsigned int GU_GetMemorySize( unsigned int width, unsigned int height, unsigned int psm )
 {
-	switch (psm)
+	switch ( psm )
 	{
 	case GU_PSM_T4: return ( ( width * height ) >> 1);
 	case GU_PSM_T8: return width * height;
@@ -139,21 +140,26 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 qboolean SW_CreateBuffer( int width, int height, uint *stride, uint *bpp, uint *r, uint *g, uint *b )
 {
 	*stride = BUFFER_WIDTH;
-	*bpp = 4;
-	*r = 256 & 0xFF;
-	*g = 256 >> 8 & 0xFF;
-	*b = 256 >> 16 & 0xFF;
+	*bpp = 2;
+	*b = 31;
+	*g = 63 << 5;
+	*r = 31 << 11;
 
-	fbp0 = GU_GetStaticVramBuffer( BUFFER_WIDTH, SCREEN_HEIGHT, GU_PSM_8888 );
-	fbp1 = GU_GetStaticVramBuffer( BUFFER_WIDTH, SCREEN_HEIGHT, GU_PSM_8888 );
+	fbp0 = GU_GetStaticVramBuffer( BUFFER_WIDTH, SCREEN_HEIGHT, GU_PSM_5650 );
+	fbp1 = GU_GetStaticVramBuffer( BUFFER_WIDTH, SCREEN_HEIGHT, GU_PSM_5650 );
 
 	sceGuInit();
 	sceGuStart( GU_DIRECT, list );
-	sceGuDrawBuffer( GU_PSM_8888, fbp0, BUFFER_WIDTH );
+	sceGuDrawBuffer( GU_PSM_5650, fbp0, BUFFER_WIDTH );
 	sceGuDispBuffer( SCREEN_WIDTH, SCREEN_HEIGHT, fbp1, BUFFER_WIDTH );
-	//sceGuScissor( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
+	sceGuOffset( 2048 - ( SCREEN_WIDTH / 2 ), 2048 - ( SCREEN_HEIGHT / 2 ) );
+	sceGuViewport( 2048, 2048, SCREEN_WIDTH, SCREEN_HEIGHT );
+	sceGuEnable( GU_SCISSOR_TEST );
+	sceGuScissor( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
+	sceGuClear( GU_COLOR_BUFFER_BIT );
+
 	sceGuFinish();
-	sceGuSync(0, 0);
+	sceGuSync( GU_SYNC_FINISH, GU_SYNC_WHAT_DONE );
 
 	sceDisplayWaitVblankStart();
 	sceGuDisplay( GU_TRUE );
@@ -164,14 +170,15 @@ qboolean SW_CreateBuffer( int width, int height, uint *stride, uint *bpp, uint *
 void *SW_LockBuffer( void )
 {
 	sceGuStart( GU_DIRECT, list );
-	//sceGuClear( GU_COLOR_BUFFER_BIT );
+	sceGuClear( GU_COLOR_BUFFER_BIT );
 	return fbp0;
 }
 
 void SW_UnlockBuffer( void )
 {
+	//sceKernelDcacheWritebackAll();
 	sceGuFinish();
-	sceGuSync( 0, 0 );
+	sceGuSync( GU_SYNC_FINISH, GU_SYNC_WHAT_DONE );
 	fbp0 = sceGuSwapBuffers();
 }
 
