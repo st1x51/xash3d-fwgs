@@ -46,7 +46,7 @@ class Subproject:
 		return True
 
 SUBDIRS = [
-	Subproject('public',      dedicated=False, mandatory = True),
+	Subproject('public', dedicated=False, mandatory=True),
 	Subproject('game_launch', singlebin=True),
 	Subproject('ref_gl',),
 	Subproject('ref_soft'),
@@ -116,6 +116,7 @@ def configure(conf):
 	enforce_pic = True # modern defaults
 	valid_build_types = ['fastnative', 'fast', 'release', 'debug', 'nooptimize', 'sanitize', 'none']
 	conf.load('fwgslib reconfigure')
+
 	if conf.options.IGNORE_PROJECTS:
 		conf.env.IGNORE_PROJECTS = conf.options.IGNORE_PROJECTS.split(',')
 
@@ -137,7 +138,9 @@ def configure(conf):
 	# TODO: wrapper around bld.stlib, bld.shlib and so on?
 	conf.env.MSVC_SUBSYSTEM = 'WINDOWS,5.01'
 	conf.env.MSVC_TARGETS = ['x86'] # explicitly request x86 target for MSVC
+
 	conf.load('subproject xcompile xshlib compiler_c compiler_cxx gitversion clang_compilation_database strip_on_install waf_unit_test')
+
 	if conf.env.COMPILER_CC == 'msvc':
 		conf.load('msvc msvc_pdb msdev msvs')
 
@@ -175,6 +178,18 @@ def configure(conf):
 		conf.env.LINKFLAGS_MAGX = ['-Wl,-rpath-link=' + i for i in conf.env.LIBPATH_MAGX]
 		for lib in ['qte-mt', 'ezxappbase', 'ezxpm', 'log_util']:
 			conf.check_cc(lib=lib, use='MAGX', uselib_store='MAGX')
+	
+	if conf.env.DEST_OS == 'psp':
+		conf.options.SINGLE_BINARY = True
+		conf.options.NO_VGUI = True
+		conf.options.LOW_MEMORY = 2
+		conf.options.GL = False
+		conf.options.STATIC = True
+		conf.options.STATIC_LINKING = 'server,client,ref_soft,menu'
+		conf.options.IGNORE_PROJECTS = 'ref_gl'
+		conf.env.IGNORE_PROJECTS = conf.options.IGNORE_PROJECTS.split(',')
+		enforce_pic = False
+		conf.load('xshlib')
 
 	if enforce_pic:
 		# Every static library must have fPIC
@@ -349,6 +364,7 @@ def configure(conf):
 
 	conf.env.DEDICATED     = conf.options.DEDICATED
 	conf.env.SINGLE_BINARY = conf.options.SINGLE_BINARY or conf.env.DEDICATED
+
 	if conf.env.DEST_OS == 'dos':
 		conf.env.SINGLE_BINARY = True
 
@@ -402,8 +418,11 @@ def configure(conf):
 
 def build(bld):
 	bld.load('xshlib')
+
 	for i in SUBDIRS:
 		if not i.is_enabled(bld):
 			continue
 
 		bld.add_subproject(i.name)
+	
+	bld.load('psp')

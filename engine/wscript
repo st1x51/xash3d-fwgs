@@ -40,7 +40,7 @@ def configure(conf):
 		conf.options.STATIC = True
 		conf.options.NO_ASYNC_RESOLVE = True
 		if not conf.check_cc( fragment='int main(){ int i = socket();}', lib = 'wattcpwl', mandatory=False ):
-			conf.define('XASH_NO_NETWORK',1)
+			conf.define('XASH_NO_NETWORK', 1)
 	elif conf.env.DEST_OS == 'android': # Android doesn't need SDL2
 		for i in ['android', 'log', 'EGL']:
 			conf.check_cc(lib = i)
@@ -56,7 +56,8 @@ def configure(conf):
 			conf.check_cc( lib='rt' )
 		conf.env.HAVE_SDL2 = True
 	elif conf.env.DEST_OS == 'psp':
-		conf.define('XASH_NO_NETWORK',1)
+		conf.options.NO_ASYNC_RESOLVE = True
+		conf.define('XASH_NO_NETWORK', 1)
 	else:
 		conf.load('sdl2')
 		if not conf.env.HAVE_SDL2:
@@ -135,7 +136,6 @@ def build(bld):
 		source += bld.path.ant_glob(['platform/android/*.cpp', 'platform/android/*.c', 'platform/linux/*.c'])
 	
 	if bld.env.DEST_OS == 'psp':
-		# libs += ['LOG', 'EGL', 'ANDROID']
 		source += bld.path.ant_glob(['platform/psp/*.c'])
 		source += bld.path.ant_glob(['platform/stub/s_stub.c'])
 
