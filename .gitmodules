@@ -22,3 +22,4 @@
 [submodule "hlsdk-xash3d"]
 	path = hlsdk-xash3d
 	url = https://github.com/Velaron/hlsdk-xash3d
+	branch = psp-port

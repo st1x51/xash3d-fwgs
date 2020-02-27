@@ -103,6 +103,14 @@ int main( int argc, char** argv )
 		IOS_LaunchDialog();
 	}
 #endif
+
+#if XASH_PSP
+  	g_pszArgv[g_iArgc++] = "-dev";
+	g_pszArgv[g_iArgc++] = "5";
+	g_pszArgv[g_iArgc++] = "+map";
+	g_pszArgv[g_iArgc++] = "stalkyard";
+#endif
+
 	return Host_Main( g_iArgc, g_pszArgv, gamedir, 0, &Launcher_ChangeGame );
 }
 

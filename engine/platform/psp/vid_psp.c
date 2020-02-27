@@ -7,6 +7,8 @@
 #include <pspgu.h>
 #include <pspkernel.h>
 
+#define VRAM_ADDRESS 0x04000000
+
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 272
 #define BUFFER_WIDTH 512
@@ -141,9 +143,9 @@ qboolean SW_CreateBuffer( int width, int height, uint *stride, uint *bpp, uint *
 {
 	*stride = BUFFER_WIDTH;
 	*bpp = 2;
-	*b = 31;
+	*r = 31;
 	*g = 63 << 5;
-	*r = 31 << 11;
+	*b = 31 << 11;
 
 	fbp0 = GU_GetStaticVramBuffer( BUFFER_WIDTH, SCREEN_HEIGHT, GU_PSM_5650 );
 	fbp1 = GU_GetStaticVramBuffer( BUFFER_WIDTH, SCREEN_HEIGHT, GU_PSM_5650 );
@@ -164,21 +166,27 @@ qboolean SW_CreateBuffer( int width, int height, uint *stride, uint *bpp, uint *
 	sceDisplayWaitVblankStart();
 	sceGuDisplay( GU_TRUE );
 
+	//sceGuStart( GU_DIRECT, list );
+
 	return true;
 }
 
 void *SW_LockBuffer( void )
 {
 	sceGuStart( GU_DIRECT, list );
-	sceGuClear( GU_COLOR_BUFFER_BIT );
-	return fbp0;
+	return VRAM_ADDRESS + fbp0;
 }
 
 void SW_UnlockBuffer( void )
 {
-	//sceKernelDcacheWritebackAll();
 	sceGuFinish();
 	sceGuSync( GU_SYNC_FINISH, GU_SYNC_WHAT_DONE );
+
+	if ( vsync )
+	{
+		sceDisplayWaitVblankStart();
+	}
+
 	fbp0 = sceGuSwapBuffers();
 }
 
